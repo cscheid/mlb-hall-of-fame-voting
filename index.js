@@ -36,6 +36,7 @@ function create_players(csv) {
         player.last_appearance = Number(last_appearance.Year);
         var v = last_appearance["X.vote"];
         player.last_vote = Number(v.substr(0, v.length-1));
+        player.position = last_appearance.position;
     }
     var lst = [];
     for (player_name in players) {
@@ -226,13 +227,30 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
         var method = d.Appearances[d.Appearances.length-1].method;
         return method_query_value === 0 || ((1 << Number(method)) & method_query_value);
     }
-    var query_list = [name_query, method_query];
 
-    var legend = d3.select("#legend").append("svg")
+    var positions = [
+        "P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "OF", "DH", "Manager"
+    ];
+    var position_mask = {};
+    for (i=0; i<positions.length; ++i)
+        position_mask[positions[i]] = 1 << i;
+
+    var position_query_value = 0;
+    function position_query(d) {
+        var position = position_mask[d.position];
+        return position_query_value === 0 || (position & position_query_value);
+    }
+
+    var query_list = [name_query, method_query, position_query];
+
+    //////////////////////////////////////////////////////////////////////////
+    // induction legend
+
+    var induction_legend = d3.select("#induction_legend").append("svg")
         .attr("width", 240)
         .attr("height", margin.top + height + margin.bottom);
 
-    var legend_items = legend.selectAll("g")
+    var induction_legend_items = induction_legend.selectAll("g")
         .data(["Not yet inducted",
                "BBWAA >75%",
                "Special",
@@ -242,44 +260,95 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
         .enter()
         .append("g");
 
-    var legend_y = d3.scale.linear()
+    var induction_legend_y = d3.scale.linear()
         .domain([0, 6])
         .range([margin.top, margin.top + 6 * 20]);
 
-    var legend_rects, legend_texts;
-    function update_legend_query(d, i) {
+    var induction_legend_rects, induction_legend_texts;
+    function update_induction_legend_query(d, i) {
         method_query_value = method_query_value ^ (1 << i);
         refresh_query();
-        legend_rects.transition()
+        induction_legend_rects.transition()
             .attr("fill-opacity", function(d, i) { 
                 return (method_query_value === 0 || ((1 << i) & method_query_value)) ?
                     1.0 : 0.2;
             });
-        legend_texts.transition()
+        induction_legend_texts.transition()
             .attr("fill-opacity", function(d, i) { 
                 return (method_query_value === 0 || ((1 << i) & method_query_value)) ?
                     1.0 : 0.2;
             });
     }
-    legend_items.append("rect")
+    induction_legend_items.append("rect")
         .attr("width", 10)
         .attr("height", 10)
         .attr("x", 5)
-        .attr("y", function(d, i) { return legend_y(i); })
+        .attr("y", function(d, i) { return induction_legend_y(i); })
         .attr("stroke", "none")
         .style("cursor", "pointer")
         .attr("fill", function(d, i) { return colors(i); })
-        .on("click", update_legend_query);
+        .on("click", update_induction_legend_query);
 
-    legend_items.append("text")
+    induction_legend_items.append("text")
         .text(function(d) { return d; })
         .attr("x", 18)
-        .attr("y", function(d, i) { return legend_y(i) + 10; })
+        .attr("y", function(d, i) { return induction_legend_y(i) + 10; })
         .style("cursor", "pointer")
-        .on("click", update_legend_query);
+        .on("click", update_induction_legend_query);
 
-    legend_rects = legend.selectAll("rect");
-    legend_texts = legend.selectAll("text");
+    induction_legend_rects = induction_legend.selectAll("rect");
+    induction_legend_texts = induction_legend.selectAll("text");
+
+    //////////////////////////////////////////////////////////////////////////
+    // position legend
+
+    var position_legend = d3.select("#position_legend").append("svg")
+        .attr("width", 240)
+        .attr("height", margin.top + height + margin.bottom);
+
+    var position_legend_items = position_legend.selectAll("g")
+        .data(positions)
+        .enter()
+        .append("g");
+
+    var position_legend_y = d3.scale.linear()
+        .domain([0, positions.length])
+        .range([margin.top, margin.top + positions.length * 20]);
+
+    var position_legend_rects, position_legend_texts;
+    function update_position_legend_query(d, i) {
+        position_query_value = position_query_value ^ (1 << i);
+        refresh_query();
+        position_legend_rects.transition()
+            .attr("fill-opacity", function(d, i) { 
+                return (position_query_value === 0 || ((1 << i) & position_query_value)) ?
+                    1.0 : 0.2;
+            });
+        position_legend_texts.transition()
+            .attr("fill-opacity", function(d, i) { 
+                return (position_query_value === 0 || ((1 << i) & position_query_value)) ?
+                    1.0 : 0.2;
+            });
+    }
+    position_legend_items.append("rect")
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("x", 5)
+        .attr("y", function(d, i) { return position_legend_y(i); })
+        .attr("stroke", "none")
+        .style("cursor", "pointer")
+        .attr("fill", "black")
+        .on("click", update_position_legend_query);
+
+    position_legend_items.append("text")
+        .text(function(d) { return d; })
+        .attr("x", 18)
+        .attr("y", function(d, i) { return position_legend_y(i) + 10; })
+        .style("cursor", "pointer")
+        .on("click", update_position_legend_query);
+
+    position_legend_rects = position_legend.selectAll("rect");
+    position_legend_texts = position_legend.selectAll("text");
 
     function refresh_query() {
         function query(d) {
