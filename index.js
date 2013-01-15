@@ -198,6 +198,18 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
 	.attr("transform", "rotate(-90)")
 	.text("Percentage of Ballots");
 
+    var name_box_value = "";
+    function name_query(d) {
+        return name_box_value === "" || (d._lowercase_name.indexOf(name_box_value) !== -1);
+    }
+
+    var method_query_value = 0;
+    function method_query(d) {
+        var method = d.Appearances[d.Appearances.length-1].method;
+        return method_query_value === 0 || ((1 << Number(method)) & method_query_value);
+    }
+    var query_list = [name_query, method_query];
+
     var legend = d3.select("#legend").append("svg")
         .attr("width", 240)
         .attr("height", margin.top + height + margin.bottom);
@@ -216,24 +228,40 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
         .domain([0, 6])
         .range([margin.top, margin.top + 6 * 20]);
 
+    var legend_rects, legend_texts;
+    function update_legend_query(d, i) {
+        method_query_value = method_query_value ^ (1 << i);
+        refresh_query();
+        legend_rects.transition()
+            .attr("fill-opacity", function(d, i) { 
+                return (method_query_value === 0 || ((1 << i) & method_query_value)) ?
+                    1.0 : 0.2;
+            });
+        legend_texts.transition()
+            .attr("fill-opacity", function(d, i) { 
+                return (method_query_value === 0 || ((1 << i) & method_query_value)) ?
+                    1.0 : 0.2;
+            });
+    }
     legend_items.append("rect")
         .attr("width", 10)
         .attr("height", 10)
         .attr("x", 5)
         .attr("y", function(d, i) { return legend_y(i); })
         .attr("stroke", "none")
-        .attr("fill", function(d, i) { return colors(i); });
+        .style("cursor", "pointer")
+        .attr("fill", function(d, i) { return colors(i); })
+        .on("click", update_legend_query);
 
     legend_items.append("text")
         .text(function(d) { return d; })
         .attr("x", 18)
-        .attr("y", function(d, i) { return legend_y(i) + 10; });
+        .attr("y", function(d, i) { return legend_y(i) + 10; })
+        .style("cursor", "pointer")
+        .on("click", update_legend_query);
 
-    var name_box_value = "";
-    function name_query(d) {
-        return name_box_value === "" || (d._lowercase_name.indexOf(name_box_value) !== -1);
-    }
-    var query_list = [name_query];
+    legend_rects = legend.selectAll("rect");
+    legend_texts = legend.selectAll("text");
 
     function refresh_query() {
         function query(d) {
