@@ -1,5 +1,5 @@
 var width = 1100, height = 500;
-var margin = {top: 20, right: 20, bottom: 40, left: 50};
+var margin = { top: 20, right: 20, bottom: 40, left: 50 };
 
 // var min = Infinity,
 //     max = -Infinity;
@@ -54,7 +54,7 @@ function create_players(csv) {
     return players;
 }
 
-d3.csv("HOFvotingdata2.csv", function(error, csv) {
+d3.csv("HOFvotingdata.csv", function(error, csv) {
     var players = create_players(csv);
 
     var svg = d3.select("body").append("svg")
@@ -109,22 +109,18 @@ d3.csv("HOFvotingdata2.csv", function(error, csv) {
 
     var lines = {};
 
+    var colors = ["black", "green", "blue", "purple", "orange", "red"];
+
     svg.selectAll("circle")
         .data(players)
         .enter()
         .append("circle")
-
         .attr("r", 5)
-			  .attr("fill", function(player) {
-							var la = player.Appearances[player.Appearances.length-1];
-							if (la.method === "0") var col = "black";
-							if (la.method === "1") var col = "green";
-							if (la.method === "2") var col = "blue";
-							if (la.method === "3") var col = "purple";
-							if (la.method === "4") var col = "orange";
-							if (la.method === "5") var col = "red";
-							return(col);
-				})
+	.attr("fill", function(player) {
+	    var la = player.Appearances[player.Appearances.length-1];
+            var col = colors[Number(la.method)];
+            return col;
+	})
         .attr("stroke", "none")
         .attr("cx", function(player) {
             var la = player.Appearances[player.Appearances.length-1];
@@ -149,13 +145,12 @@ d3.csv("HOFvotingdata2.csv", function(error, csv) {
                 .attr("stroke", "rgba(0,0,0,0.3)")
                 .attr("stroke-width", 1);
         })
-			 .append("svg:title")
-             .text(function(player) {
-                 return player.Name;
-             });
+	.append("svg:title")
+        .text(function(player) {
+            return player.Name;
+        });
 
 
-			 //debugger;
     for (var i=0; i<players.length; ++i) {
         var line = d3.svg.line()
             .x(function(a) { return x(Number(a.Year)); })
@@ -166,85 +161,21 @@ d3.csv("HOFvotingdata2.csv", function(error, csv) {
             .attr("d", line(players[i].Appearances))
             .attr("stroke", "rgba(0,0,0,0.3)")
             .attr("fill", "none");
-			 }
+    }
 			 
-			 svg.append("text")
-			 .attr("class", "x label")
-			 .attr("text-anchor", "end")
-			 .attr("x", margin.left + width/2 + 20)
-			 .attr("y", height + margin.top + margin.bottom)
-			 .text("Year of Vote");
+    svg.append("text")
+	.attr("class", "x label")
+	.attr("text-anchor", "end")
+	.attr("x", margin.left + width/2 + 20)
+	.attr("y", height + margin.top + margin.bottom)
+	.text("Year of Vote");
 			 
-			 // Add a y-axis label.
-			 svg.append("text")
-			 .attr("class", "y label")
-			 .attr("text-anchor", "end")
-			 .attr("x", -height/2 + margin.left)
-			 .attr("y", margin.top)
-			 .attr("transform", "rotate(-90)")
-			 .text("Percentage of Ballots");
-			 
-
-        // .on("mouseover", function(player) {
-            
-        // });
-
-        // .append("g")
-        // .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        // .call(chart);
-
-  // var data = [];
-
-  // csv.forEach(function(x) {
-  //   var e = Math.floor(x.Expt - 1),
-  //       r = Math.floor(x.Run - 1),
-  //       s = Math.floor(x.Speed),
-  //       d = data[e];
-  //   if (!d) d = data[e] = [s];
-  //   else d.push(s);
-  //   if (s > max) max = s;
-  //   if (s < min) min = s;
-  // });
-
-  // chart.domain([min, max]);
-
-  // var svg = d3.select("body").selectAll("svg")
-  //     .data(data)
-  //   .enter().append("svg")
-  //     .attr("class", "box")
-  //     .attr("width", width + margin.left + margin.right)
-  //     .attr("height", height + margin.bottom + margin.top)
-  //   .append("g")
-  //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-  //     .call(chart);
-
-  // setInterval(function() {
-  //   svg.datum(randomize).call(chart.duration(1000));
-  // }, 2000);
+    // Add a y-axis label.
+    svg.append("text")
+	.attr("class", "y label")
+	.attr("text-anchor", "end")
+	.attr("x", -height/2 + margin.left)
+	.attr("y", margin.top)
+	.attr("transform", "rotate(-90)")
+	.text("Percentage of Ballots");
 });
-
-// function randomize(d) {
-//   if (!d.randomizer) d.randomizer = randomizer(d);
-//   return d.map(d.randomizer);
-// }
-
-// function randomizer(d) {
-//   var k = d3.max(d) * .02;
-//   return function(d) {
-//     return Math.max(min, Math.min(max, d + k * (Math.random() - .5)));
-//   };
-// }
-
-// // Returns a function to compute the interquartile range.
-// function iqr(k) {
-//   return function(d, i) {
-//     var q1 = d.quartiles[0],
-//         q3 = d.quartiles[2],
-//         iqr = (q3 - q1) * k,
-//         i = -1,
-//         j = d.length;
-//     while (d[++i] < q1 - iqr);
-//     while (d[--j] > q3 + iqr);
-//     return [i, j];
-//   };
-// }
