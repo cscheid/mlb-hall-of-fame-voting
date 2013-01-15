@@ -104,7 +104,7 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
 
     var yAxis = d3.svg.axis();
     yAxis.scale(trajectory_y).tickFormat(d3.format("d"));
-			 
+    
     yAxis.orient("left");
     svg.append("g")
 	.attr("transform", "translate(" + margin.left + ",0)")
@@ -130,6 +130,7 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
     var lines = {};
 
     var colors = d3.scale.category10();
+
     // var colors = ["black", "green", "blue", "purple", "orange", "red"];
     // var colors = d3.scale.ordinal()
     //     .domain([0, 1, 2, 3, 4, 5])
@@ -151,17 +152,17 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
         .attr("stroke", "none")
         .attr("x", function(player) { return x(player.last_appearance)-5; })
         .attr("y", function(player) { return trajectory_y(player.last_vote)-5; })
-        .on("mouseover", function(d) { 
-            lines[d.Name]
-                .transition()
+        .on("mouseover", function(player) {
+            lines[player.Name]
                 .attr("stroke-opacity", 1)
-                .attr("stroke-width", 3); 
+                .attr("stroke-width", 3)
+            ;
         })
-        .on("mouseout", function(d){ 
-            lines[d.Name]
-                .transition()
-                .attr("stroke-opacity", 0.3)
-                .attr("stroke-width", 1);
+        .on("mouseout", function(player){ 
+            lines[player.Name]
+                .attr("stroke-opacity", 0.15)
+                .attr("stroke-width", 2)
+            ;
         })
 	.append("svg:title")
         .text(function(player) {
@@ -177,18 +178,35 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
             box1.append("svg:path")
             .attr("d", line(players[i].Appearances))
             .attr("stroke", "black")
-            .attr("stroke-opacity", 0.3)
+            .attr("stroke-width", 2)
+            .attr("stroke-opacity", 0.15)
             .attr("fill", "none")
+            .on("mouseover", (function(player) {
+                return function() {
+                    lines[player.Name]
+                        .attr("stroke-opacity", 1)
+                        .attr("stroke-width", 3)
+                    ; 
+                };
+            })(players[i]))
+            .on("mouseout", (function(player) {
+                return function() {
+                    lines[player.Name]
+                        .attr("stroke-opacity", 0.15)
+                        .attr("stroke-width", 2)
+                    ;
+                };
+            })(players[i]))
         ;
     }
-			 
+    
     svg.append("text")
 	.attr("class", "x label")
 	.attr("text-anchor", "end")
 	.attr("x", margin.left + width/2 + 20)
 	.attr("y", height + margin.top + margin.bottom)
 	.text("Year of Vote");
-			 
+    
     // Add a y-axis label.
     svg.append("text")
 	.attr("class", "y label")
@@ -302,10 +320,6 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
             .attr("rx", 5)
             .attr("ry", 5)
         ;
-        // box1.selectAll("svg:path")
-        //     .transition()
-        //     .duration(1000)
-        //     .attr("stroke-opacity", 0.3);
     });
 
     $("#show-histogram").click(function() {
@@ -319,9 +333,5 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
             .attr("rx", 0)
             .attr("ry", 0)
         ;
-        // box1.selectAll("svg:path")
-        //     .transition()
-        //     .duration(1000)
-        //     .attr("stroke-opacity", 0.0);
     });
 });
