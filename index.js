@@ -1,72 +1,7 @@
-var width = 1100, height = 500;
+var width = window.innerWidth * 0.75, height = window.innerHeight * 0.5;
 var margin = { top: 20, right: 20, bottom: 40, left: 50 };
 var first_year = 1936, last_year = 2013;
 var largest_histogram_count = 0;
-
-function create_player(entry)
-{
-    return {
-        Name: entry.Name,
-        _lowercase_name: entry.Name.toLowerCase(),
-        Appearances: []
-    };
-}
-
-function create_players(csv) {
-    var players = {};
-
-    for (var i=0; i<csv.length; ++i) {
-        var entry = csv[i];
-        var player = players[entry.Name];
-        if (player === undefined) {
-            player = create_player(entry);
-            players[player.Name] = player;
-        }
-        player.Appearances.push(entry);
-    }
-
-    for (var player_name in players) {
-        var player = players[player_name];
-        player.Appearances.sort(function(a1, a2) {
-            a1 = Number(a1.Year);
-            a2 = Number(a2.Year);
-            return a1 - a2;
-        });
-        var last_appearance = player.Appearances[player.Appearances.length-1];
-        player.last_appearance = Number(last_appearance.Year);
-        var v = last_appearance["X.vote"];
-        player.last_vote = Number(v.substr(0, v.length-1));
-        player.position = last_appearance.position;
-    }
-    var lst = [];
-    for (player_name in players) {
-        lst.push(players[player_name]);
-    };
-    players = lst;
-
-    var player_list_copy = players.slice();
-    player_list_copy.sort(function(p1, p2) {
-        var c = p1.last_appearance - p2.last_appearance;
-        if (c) return c;
-        c = p1.last_vote - p2.last_vote;
-        return c;
-    });
-
-    // setup layout for histogram view
-    var histogram_position;
-    var current_year = 0;
-    for (i=0; i<player_list_copy.length; ++i) {
-        var player = player_list_copy[i];
-        if (current_year !== player.last_appearance) {
-            current_year = player.last_appearance;
-            histogram_position = 0;
-        }
-        player.histogram_position = histogram_position++;
-        largest_histogram_count = Math.max(largest_histogram_count, histogram_position);
-    }
-
-    return players;
-}
 
 d3.csv("HOFvotingdata.csv", function(error, csv) {
     var players = create_players(csv);
@@ -142,6 +77,7 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
         .enter()
         .append("rect")
         .style("cursor", "pointer")
+        .attr("fill-opacity", 1)
         .attr("rx", 5)
         .attr("ry", 5)
         .attr("width", 10)
@@ -247,7 +183,7 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
     // induction legend
 
     var induction_legend = d3.select("#induction_legend").append("svg")
-        .attr("width", 240)
+        .attr("width", (width / 10) * 1.5)
         .attr("height", margin.top + height + margin.bottom);
 
     var induction_legend_items = induction_legend.selectAll("g")
@@ -287,6 +223,7 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
         .attr("stroke", "none")
         .style("cursor", "pointer")
         .attr("fill", function(d, i) { return colors(i); })
+        .attr("fill-opacity", 1)
         .on("click", update_induction_legend_query);
 
     induction_legend_items.append("text")
@@ -294,6 +231,7 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
         .attr("x", 18)
         .attr("y", function(d, i) { return induction_legend_y(i) + 10; })
         .style("cursor", "pointer")
+        .attr("fill-opacity", 1)
         .on("click", update_induction_legend_query);
 
     induction_legend_rects = induction_legend.selectAll("rect");
@@ -303,7 +241,7 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
     // position legend
 
     var position_legend = d3.select("#position_legend").append("svg")
-        .attr("width", 240)
+        .attr("width", (width / 10) * 0.5)
         .attr("height", margin.top + height + margin.bottom);
 
     var position_legend_items = position_legend.selectAll("g")
@@ -338,6 +276,7 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
         .attr("stroke", "none")
         .style("cursor", "pointer")
         .attr("fill", "black")
+        .attr("fill-opacity", 1)
         .on("click", update_position_legend_query);
 
     position_legend_items.append("text")
@@ -345,6 +284,7 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
         .attr("x", 18)
         .attr("y", function(d, i) { return position_legend_y(i) + 10; })
         .style("cursor", "pointer")
+        .attr("fill-opacity", 1)
         .on("click", update_position_legend_query);
 
     position_legend_rects = position_legend.selectAll("rect");
