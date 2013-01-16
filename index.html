@@ -9,7 +9,7 @@ body {
 }
 
 .box {
-  font: 10px sans-serif;
+  font: 10px "Helvetica Neue", 10px Helvetica, 10px Arial, 10px sans-serif;
 }
 
 .box line,
@@ -36,16 +36,32 @@ body {
 }
 
 .axis text {
-    font-family: sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 11px;
 }
 
+h2 {
+  margin: 0px;
+  padding: 0px;
+}
 </style>
 <title>MLB Hall of Fame voting</title>
 </head>
 <body>
   <script src="d3.v3.min.js"></script>
-  <script src="box.js"></script>
+  <script src="jquery-1.6.2.min.js"></script>
+  <script src="player.js"></script>
   <script src="index.js"></script>
+  <h2>MLB Hall of Fame voting</h2><hr>
+  <div>Player Name: <input type="text" id="searchbox"></div>
+  <div>
+    View:
+    <input type="radio" name="vistype" id="show-trajectory" value="trajectory" checked>Trajectory</input>
+    <input type="radio" name="vistype" id="show-histogram" value="histogram">Outcome</input>  </div>
+  <div>
+    <span id="main"></span>
+    <span id="induction_legend"></span>
+    <span id="position_legend"></span>
+  </div>
 </body>
 </html>
