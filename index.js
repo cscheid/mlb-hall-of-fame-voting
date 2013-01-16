@@ -90,16 +90,18 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
         .attr("x", function(player) { return x(player.last_appearance)-5; })
         .attr("y", function(player) { return trajectory_y(player.last_vote)-5; })
         .on("mouseover", function(player) {
-            lines[player.Name]
-                .attr("stroke-opacity", 1)
-                .attr("stroke-width", 3)
-            ;
+            if (player._selected) {
+                lines[player.Name]
+                    .attr("stroke-opacity", 1)
+                    .attr("stroke-width", 3);
+            }
         })
         .on("mouseout", function(player){ 
-            lines[player.Name]
-                .attr("stroke-opacity", 0.15)
-                .attr("stroke-width", 2)
-            ;
+            if (player._selected) {
+                lines[player.Name]
+                    .attr("stroke-opacity", 0.15)
+                    .attr("stroke-width", 2);
+            }
         })
 	.append("svg:title")
         .text(function(player) {
@@ -124,14 +126,18 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
         .attr("stroke-opacity", 0.15)
         .attr("fill", "none")
         .on("mouseover", function(player) {
-            d3.select(this)
-                .attr("stroke-opacity", 1)
-                .attr("stroke-width", 3);
+            if (player._selected) {
+                d3.select(this)
+                    .attr("stroke-opacity", 1)
+                    .attr("stroke-width", 3);
+            }
         })
         .on("mouseout", function(player) {
-            d3.select(this)
-                .attr("stroke-opacity", 0.15)
-                .attr("stroke-width", 2);
+            if (player._selected) {
+                d3.select(this)
+                    .attr("stroke-opacity", 0.15)
+                    .attr("stroke-width", 2);
+            }
         })
         .append("svg:title")
         .text(function(player) {
@@ -298,20 +304,41 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
                     return false;
             return true;
         }
-        var c = 0;
-        function count(d) {
-            if (query(d))
-                ++c;
-        }
-        // FIXME cache query results
+
         box2.selectAll("rect")
+            .style("display", function(d) {
+                var r = query(d);
+                d._selected = r;
+                return "inline";
+            })
             .transition()
             .attr("fill-opacity", function(d) {
-                return query(d) ? 1.0 : 0.0;
+                return d._selected ? 1.0 : 0.0;
+            }).attr("stroke-opacity", function(d) {
+                return d._selected ? 1.0 : 0.0;
             })
+            .transition()
+            .duration(0)
+            .style("display", function(d) {
+                return d._selected ? "inline" : "none";
+            })
+        ;
+        box1.selectAll("path")
+            .style("display", function(d) {
+                var r = query(d);
+                d._selected = r;
+                return "inline";
+            })
+            .transition()
             .attr("stroke-opacity", function(d) {
-                return query(d) ? 1.0 : 0.0;
-            });
+                return d._selected ? 0.15 : 0.0;
+            })
+            .transition()
+            .duration(0)
+            .style("display", function(d) {
+                return d._selected ? "inline" : "none";
+            })
+        ;
     }
 
     $("#searchbox").bind("input", function(event) {

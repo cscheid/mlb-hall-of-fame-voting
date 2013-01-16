@@ -3,6 +3,7 @@ function create_player(entry)
     return {
         Name: entry.Name,
         _lowercase_name: entry.Name.toLowerCase(),
+        _selected: true,
         Appearances: []
     };
 }
