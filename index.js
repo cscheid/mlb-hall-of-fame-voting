@@ -106,36 +106,37 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
             return player.Name;
         });
 
-    for (var i=0; i<players.length; ++i) {
-        var line = d3.svg.line()
-            .x(function(a) { return x(Number(a.Year)); })
-            .y(function(a) { return trajectory_y(Number(a["X.vote"].substring(0, a["X.vote"].length-1))); });
+    // for (var i=0; i<players.length; ++i) {
+    var line = d3.svg.line()
+        .x(function(a) { return x(Number(a.Year)); })
+        .y(function(a) { return trajectory_y(Number(a["X.vote"].substring(0, a["X.vote"].length-1))); });
         
-        lines[players[i].Name] = 
-            box1.append("svg:path")
-            .attr("d", line(players[i].Appearances))
-            .attr("stroke", "black")
-            .attr("stroke-width", 2)
-            .attr("stroke-opacity", 0.15)
-            .attr("fill", "none")
-            .on("mouseover", (function(player) {
-                return function() {
-                    lines[player.Name]
-                        .attr("stroke-opacity", 1)
-                        .attr("stroke-width", 3)
-                    ; 
-                };
-            })(players[i]))
-            .on("mouseout", (function(player) {
-                return function() {
-                    lines[player.Name]
-                        .attr("stroke-opacity", 0.15)
-                        .attr("stroke-width", 2)
-                    ;
-                };
-            })(players[i]))
-        ;
-    }
+    box1.selectAll("path")
+        .data(players)
+        .enter()
+        .append("svg:path")
+        .attr("d", function(player) { 
+            lines[player.Name] = d3.select(this);
+            return line(player.Appearances); 
+        })
+        .attr("stroke", "black")
+        .attr("stroke-width", 2)
+        .attr("stroke-opacity", 0.15)
+        .attr("fill", "none")
+        .on("mouseover", function(player) {
+            d3.select(this)
+                .attr("stroke-opacity", 1)
+                .attr("stroke-width", 3);
+        })
+        .on("mouseout", function(player) {
+            d3.select(this)
+                .attr("stroke-opacity", 0.15)
+                .attr("stroke-width", 2);
+        })
+        .append("svg:title")
+        .text(function(player) {
+            return player.Name;
+        });
     
     svg.append("text")
 	.attr("class", "x label")
