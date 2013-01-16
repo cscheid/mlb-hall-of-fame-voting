@@ -59,6 +59,24 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
         .attr("y1", trajectory_y(75))
         .attr("y2", trajectory_y(75))
         .attr("stroke", "green");
+    
+    for (i=1; i<=9; ++i){
+      svg.append("line")
+        .attr("x1", x(first_year))
+        .attr("x2", x(last_year))
+        .attr("y1", trajectory_y(i*10))
+        .attr("y2", trajectory_y(i*10))
+        .attr("stroke", "white");
+    }
+
+    for (i=1; i<=8; ++i){
+      svg.append("line")
+        .attr("x1", x(i*10+1930))
+        .attr("x2", x(i*10+1930))
+        .attr("y1", trajectory_y(0))
+        .attr("y2", trajectory_y(100))
+        .attr("stroke", "white");
+    }
 
     var box1 = svg.append("g");
     var box2 = svg.append("g");
@@ -195,10 +213,10 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
 
     var induction_legend_items = induction_legend.selectAll("g")
         .data(["Not yet inducted",
-               "BBWAA >75%",
-               "Special",
-               "BBWAA Runoff",
-               "Veteran's Committee",
+               "BBWAA > 75%",
+               "BBWAA Special Election",
+               "BBWAA Runoff Election",
+               "Veterans Committee",
                "Negro Leagues Committee"])
         .enter()
         .append("g");
