@@ -2,6 +2,9 @@ var width = window.innerWidth * 0.75, height = window.innerHeight * 0.5;
 var margin = { top: 20, right: 20, bottom: 40, left: 50 };
 var first_year = 1936, last_year = 2013;
 var largest_histogram_count = 0;
+var players;
+var cf, all, war, wars, jaws, jawss, chart, hr, hrs;
+var formatNumber = d3.format(",d");
 
 function create_vis(players)
 {
@@ -400,9 +403,292 @@ function create_vis(players)
     });
 }
 
-d3.csv("player_data.csv", function(error, csv) {
-    d3.csv("election_data.csv", function(error, csv2) {
-        players = create_players(csv, csv2);
+// from github.com/square/crossfilter
+function barChart() {
+    if (!barChart.id) barChart.id = 0;
+
+    var margin = {top: 10, right: 10, bottom: 10, left: 50},
+        x,
+        y = d3.scale.linear().range([0, 100]),
+        id = barChart.id++,
+        axis = d3.svg.axis().orient("left"),
+        brush = d3.svg.brush(),
+        brushDirty,
+        dimension,
+        group,
+        round;
+
+    function chart(div) {
+        var width = x.range()[1],
+            height = y.range()[1];
+
+        y.domain([0, group.top(1)[0].value]);
+
+        div.each(function() {
+            var div = d3.select(this),
+                g = div.select("g");
+
+            // Create the skeletal chart.
+            if (g.empty()) {
+                div.select(".title").append("a")
+                    .attr("href", "javascript:reset(" + id + ")")
+                    .attr("class", "reset")
+                    .text("reset")
+                    .style("display", "none");
+
+                g = div.append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                g.append("clipPath")
+                    .attr("id", "clip-" + id)
+                    .append("rect")
+                    .attr("width", width)
+                    .attr("height", height);
+
+                g.selectAll(".bar")
+                    .data(["background", "foreground"])
+                    .enter().append("path")
+                    .attr("class", function(d) { return d + " bar"; })
+                    .datum(group.all());
+
+                g.selectAll(".foreground.bar")
+                    .attr("clip-path", "url(#clip-" + id + ")");
+
+                g.append("g")
+                    .attr("class", "axis")
+                    // .attr("transform", "translate(0," + height + ")")
+                    .call(axis);
+
+                // Initialize the brush component with pretty resize handles.
+                var gBrush = g.append("g").attr("class", "brush").call(brush);
+                gBrush.selectAll("rect").attr("height", height);
+                gBrush.selectAll(".resize").append("path").attr("d", resizePath);
+            }
+
+            // Only redraw the brush if set externally.
+            if (brushDirty) {
+                brushDirty = false;
+                g.selectAll(".brush").call(brush);
+                div.select(".title a").style("display", brush.empty() ? "none" : null);
+                if (brush.empty()) {
+                    g.selectAll("#clip-" + id + " rect")
+                        .attr("x", 0)
+                        .attr("width", width);
+                } else {
+                    var extent = brush.extent();
+                    g.selectAll("#clip-" + id + " rect")
+                        .attr("x", x(extent[0]))
+                        .attr("width", x(extent[1]) - x(extent[0]));
+                }
+            }
+
+            g.selectAll(".bar").attr("d", barPath);
+        });
+
+        function barPath(groups) {
+            var path = [],
+            i = -1,
+            n = groups.length,
+            d;
+            while (++i < n) {
+                d = groups[i];
+                path.push("M0,", x(d.key), "H", y(d.value), "v9H0");
+            }
+            return path.join("");
+        }
+
+        function resizePath(d) {
+            var e = +(d == "n"),
+            x = e ? 1 : -1,
+            y = height / 3;
+            return "M" + (.5 * x) + "," + y
+                + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6)
+                + "V" + (2 * y - 6)
+                + "A6,6 0 0 " + e + " " + (.5 * x) + "," + (2 * y)
+                + "Z"
+                + "M" + (2.5 * x) + "," + (y + 8)
+                + "V" + (2 * y - 8)
+                + "M" + (4.5 * x) + "," + (y + 8)
+                + "V" + (2 * y - 8);
+        }
+    }
+
+    brush.on("brushstart.chart", function() {
+        var div = d3.select(this.parentNode.parentNode.parentNode);
+        div.select(".title a").style("display", null);
+    });
+
+    brush.on("brush.chart", function() {
+        var g = d3.select(this.parentNode),
+        extent = brush.extent();
+        if (round) g.select(".brush")
+            .call(brush.extent(extent = extent.map(round)))
+            .selectAll(".resize")
+            .style("display", null);
+        g.select("#clip-" + id + " rect")
+            .attr("x", x(extent[0]))
+            .attr("width", x(extent[1]) - x(extent[0]));
+        dimension.filterRange(extent);
+    });
+
+    brush.on("brushend.chart", function() {
+        if (brush.empty()) {
+            var div = d3.select(this.parentNode.parentNode.parentNode);
+            div.select(".title a").style("display", "none");
+            div.select("#clip-" + id + " rect").attr("x", null).attr("width", "100%");
+            dimension.filterAll();
+        }
+    });
+
+    chart.margin = function(_) {
+        if (!arguments.length) return margin;
+        margin = _;
+        return chart;
+    };
+
+    chart.x = function(_) {
+        if (!arguments.length) return x;
+        x = _;
+        axis.scale(x);
+        brush.x(x);
+        return chart;
+    };
+
+    chart.y = function(_) {
+        if (!arguments.length) return y;
+        y = _;
+        return chart;
+    };
+
+    chart.dimension = function(_) {
+        if (!arguments.length) return dimension;
+        dimension = _;
+        return chart;
+    };
+
+    chart.filter = function(_) {
+        if (_) {
+            brush.extent(_);
+            dimension.filterRange(_);
+        } else {
+            brush.clear();
+            dimension.filterAll();
+        }
+        brushDirty = true;
+        return chart;
+    };
+
+    chart.group = function(_) {
+        if (!arguments.length) return group;
+        group = _;
+        return chart;
+    };
+
+    chart.round = function(_) {
+        if (!arguments.length) return round;
+        round = _;
+        return chart;
+    };
+
+    return d3.rebind(chart, brush, "on");
+}
+
+d3.csv("player_data.csv", function(error, player_csv) {
+    d3.csv("election_data.csv", function(error, election_csv) {
+        players = create_players(player_csv, election_csv);
+
+        cf = crossfilter(player_csv);
+        all = cf.groupAll();
+
+        war = cf.dimension(function(d) { return Number(d.WAR); });
+        wars = war.group(function(d) {
+            return Math.floor((d + 6.7) / 16) * 16;
+        });
+
+        jaws = cf.dimension(function(d) { 
+            var t = Number(d.JAWS); 
+            return (isNaN(t)) ? undefined : t; 
+        });
+        jawss = jaws.group(function(d) {
+            return Math.floor((d + 2.6) / 13) * 13;
+        });
+
+        hr = cf.dimension(function(d) { 
+            var t = Number(d.HR); 
+            return (isNaN(t)) ? 0 : t; 
+        }); 
+        hrs = hr.group(function(d) {
+            return Math.floor(d / 76) * 76;
+        });
+        
         create_vis(players);
+
+        window.filter = function(filters) {
+            filters.forEach(function(d, i) { charts[i].filter(d); });
+            renderAll();
+        };
+
+        window.reset = function(i) {
+            charts[i].filter(null);
+            renderAll();
+        };
+
+        function render(method) {
+            d3.select(this).call(method);
+        }
+
+        function renderAll() {
+            chart.each(render);
+            // list.each(render);
+            d3.select("#active").text(formatNumber(all.value()));
+        }
+
+        var charts = [];
+        var dimensions = [];
+        var groups = [];
+
+        var stats = ["HOFm", "HOFs", "Yrs", "WAR", "WAR7", "JAWS", "Jpos", "G", "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus", "W", "L", "ERA", "ERA.Plus"];
+        _.each(stats, function(stat) {
+            var select = function(d) {
+                return Number(d[stat]);
+            };
+            var dimension = cf.dimension(select);
+            var vs = _.map(player_csv, select);
+            var min = d3.min(vs), max = d3.max(vs), range = max - min;
+            var group = dimension.group(function(d) {
+                var t = (d - min) / range * 10;
+                return Math.floor(t) * range / 10 + min;
+            });
+            dimensions.push(dimension);
+            groups.push(group);
+            var c = barChart()
+                        .dimension(dimension)
+                        .group(group)
+                        .x(d3.scale.linear()
+                           .domain([min, max])
+                           .range([0, 10 * 10]));
+            c._stat = stat;
+            charts.push(c);
+        });
+
+        d3.select("#charts")
+            .selectAll(".chart")
+            .data(charts)
+            .enter()
+            .append("div")
+            .attr("id", function(d) { return d._stat + "-chart"; })
+            .attr("class", "chart")
+            .append("div")
+            .attr("class", "title")
+            .text(function(d) { return d._stat; });
+
+        var chart = d3.selectAll(".chart")
+            .data(charts)
+            .each(function(chart) { chart.on("brush", renderAll).on("brushend", renderAll); });
+        renderAll();
+
     });
 });

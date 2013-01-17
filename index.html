@@ -44,12 +44,60 @@ h2 {
   margin: 0px;
   padding: 0px;
 }
+
+#charts {
+  padding: 10px 0;
+}
+
+.chart {
+  display: inline-block;
+  height: 151px;
+  margin-bottom: 20px;
+}
+
+
+.reset {
+  padding-left: 1em;
+  font-size: smaller;
+  color: #ccc;
+}
+
+.background.bar {
+  fill: #ccc;
+}
+
+.foreground.bar {
+  fill: steelblue;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.brush rect.extent {
+  fill: steelblue;
+  fill-opacity: .125;
+}
+
+.brush .resize path {
+  fill: #eee;
+  stroke: #666;
+}
+
 </style>
 <title>MLB Hall of Fame voting</title>
 </head>
 <body>
   <script src="d3.v3.min.js"></script>
+  <script src="crossfilter.v1.min.js"></script>
   <script src="jquery-1.6.2.min.js"></script>
+  <script src="underscore-min.js"></script>
   <script src="player.js"></script>
   <script src="index.js"></script>
   <h2>MLB Hall of Fame voting</h2><hr>
@@ -62,6 +110,8 @@ h2 {
     <span id="main"></span>
     <span id="induction_legend"></span>
     <span id="position_legend"></span>
+  </div>
+  <div id="charts">
   </div>
 </body>
 </html>
