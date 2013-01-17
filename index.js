@@ -464,7 +464,7 @@ function barChart() {
 
                 // Initialize the brush component with pretty resize handles.
                 var gBrush = g.append("g").attr("class", "brush").call(brush);
-                gBrush.selectAll("rect").attr("height", height);
+                gBrush.selectAll("rect").attr("width", width);
                 gBrush.selectAll(".resize").append("path").attr("d", resizePath);
             }
 
@@ -475,13 +475,13 @@ function barChart() {
                 div.select(".title a").style("display", brush.empty() ? "none" : null);
                 if (brush.empty()) {
                     g.selectAll("#clip-" + id + " rect")
-                        .attr("x", 0)
-                        .attr("width", width);
+                        .attr("y", 0)
+                        .attr("height", height);
                 } else {
                     var extent = brush.extent();
                     g.selectAll("#clip-" + id + " rect")
-                        .attr("x", x(extent[0]))
-                        .attr("width", x(extent[1]) - x(extent[0]));
+                        .attr("y", x(extent[0]))
+                        .attr("height", x(extent[1]) - x(extent[0]));
                 }
             }
 
@@ -501,9 +501,20 @@ function barChart() {
         }
 
         function resizePath(d) {
-            var e = +(d == "n"),
+            var e = +(d == "s"),
             x = e ? 1 : -1,
-            y = height / 3;
+            y = width / 3;
+
+            return "M" + y + "," + (.5 * x)
+                + "A6,6 0 0 " + (1-e) + " " + (y + 6) + "," + (6.5 * x)
+                + "H" + (2 * y - 6)
+                + "A6,6 0 0 " + (1-e) + " " + (2 * y) + "," + (.5 * x)
+                + "Z"
+                + "M" + (y + 8) + "," + (2.5 * x)
+                + "H" + (2 * y - 8)
+                + "M" + (y + 8) + "," + (4.5 * x)
+                + "H" + (2 * y - 8);
+
             return "M" + (.5 * x) + "," + y
                 + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6)
                 + "V" + (2 * y - 6)
@@ -529,8 +540,8 @@ function barChart() {
             .selectAll(".resize")
             .style("display", null);
         g.select("#clip-" + id + " rect")
-            .attr("x", x(extent[0]))
-            .attr("width", x(extent[1]) - x(extent[0]));
+            .attr("y", x(extent[0]))
+            .attr("height", x(extent[1]) - x(extent[0]));
         dimension.filterRange(extent);
     });
 
@@ -538,7 +549,7 @@ function barChart() {
         if (brush.empty()) {
             var div = d3.select(this.parentNode.parentNode.parentNode);
             div.select(".title a").style("display", "none");
-            div.select("#clip-" + id + " rect").attr("x", null).attr("width", "100%");
+            div.select("#clip-" + id + " rect").attr("y", null).attr("height", "100%");
             dimension.filterAll();
         }
     });
@@ -551,9 +562,9 @@ function barChart() {
 
     chart.x = function(_) {
         if (!arguments.length) return x;
-        x = _;
+         x = _;
         axis.scale(x);
-        brush.x(x);
+        brush.y(x);
         return chart;
     };
 
