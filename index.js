@@ -3,9 +3,8 @@ var margin = { top: 20, right: 20, bottom: 40, left: 50 };
 var first_year = 1936, last_year = 2013;
 var largest_histogram_count = 0;
 
-d3.csv("HOFvotingdata.csv", function(error, csv) {
-    var players = create_players(csv);
-
+function create_vis(players)
+{
     var svg = d3.select("#main").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom);
@@ -101,12 +100,14 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
         .attr("width", 10)
         .attr("height", 10)
 	.attr("fill", function(player) {
-	    var la = player.Appearances[player.Appearances.length-1];
-            return colors(Number(la.method));
+	    var la = player.Stats.method;
+            return colors(Number(la));
 	})
         .attr("stroke", "none")
         .attr("x", function(player) { return x(player.last_appearance)-5; })
-        .attr("y", function(player) { return trajectory_y(player.last_vote)-5; })
+        .attr("y", function(player) { 
+            return trajectory_y(player.last_vote)-5; 
+        })
         .on("mouseover", function(player) {
             if (player._selected) {
                 lines[player.Name]
@@ -129,15 +130,23 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
     // for (var i=0; i<players.length; ++i) {
     var line = d3.svg.line()
         .x(function(a) { return x(Number(a.Year)); })
-        .y(function(a) { return trajectory_y(Number(a["X.vote"].substring(0, a["X.vote"].length-1))); });
-        
+        .y(function(a) { 
+            var t = Number(a["pct"]);
+            if (isNaN(t)) t = 100; // only happens for Lou Gehrig;
+            return trajectory_y(t); 
+        });
+    
     box1.selectAll("path")
         .data(players)
         .enter()
         .append("svg:path")
         .attr("d", function(player) { 
             lines[player.Name] = d3.select(this);
-            return line(player.Appearances); 
+            var x = line(player.Appearances); 
+            if (x.indexOf("NaN") !== -1) {
+                debugger;
+            }
+            return x;
         })
         .attr("stroke", "black")
         .attr("stroke-width", 2)
@@ -185,7 +194,7 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
 
     var method_query_value = 0;
     function method_query(d) {
-        var method = d.Appearances[d.Appearances.length-1].method;
+        var method = d.Stats.method;
         return method_query_value === 0 || ((1 << Number(method)) & method_query_value);
     }
 
@@ -388,5 +397,12 @@ d3.csv("HOFvotingdata.csv", function(error, csv) {
             .attr("rx", 0)
             .attr("ry", 0)
         ;
+    });
+}
+
+d3.csv("player_data.csv", function(error, csv) {
+    d3.csv("election_data.csv", function(error, csv2) {
+        players = create_players(csv, csv2);
+        create_vis(players);
     });
 });

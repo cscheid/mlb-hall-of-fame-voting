@@ -2,24 +2,31 @@ function create_player(entry)
 {
     return {
         Name: entry.Name,
+        Stats: entry,
         _lowercase_name: entry.Name.toLowerCase(),
         _selected: true,
         Appearances: []
     };
 }
 
-function create_players(csv) {
+function create_players(csv, csv2) {
+    var i;
     var players = {};
 
-    for (var i=0; i<csv.length; ++i) {
+    for (i=0; i<csv.length; ++i) {
         var entry = csv[i];
         var player = players[entry.Name];
         if (player === undefined) {
             player = create_player(entry);
             players[player.Name] = player;
         }
-        player.Appearances.push(entry);
+        // player.Appearances.push(entry);
     }
+
+    for (i=0; i<csv2.length; ++i) {
+        var entry = csv2[i];
+        players[entry.Name].Appearances.push(entry);
+    } 
 
     for (var player_name in players) {
         var player = players[player_name];
@@ -30,9 +37,11 @@ function create_players(csv) {
         });
         var last_appearance = player.Appearances[player.Appearances.length-1];
         player.last_appearance = Number(last_appearance.Year);
-        var v = last_appearance["X.vote"];
-        player.last_vote = Number(v.substr(0, v.length-1));
-        player.position = last_appearance.position;
+        var v = last_appearance["pct"];
+        player.last_vote = Number(v);
+        if (isNaN(player.last_vote))
+            player.last_vote = 100; // only happens for Lou Gehrig
+        player.position = player.Stats.position;
     }
     var lst = [];
     for (player_name in players) {
