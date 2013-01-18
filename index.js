@@ -9,6 +9,27 @@ var player_dots;
 var player_paths;
 var induction_method_dimension, player_position_dimension, name_dimension;
 
+function show_player(player)
+{
+    var lst1 = ["Name", "Position", "Years", "Games", "Hits", "Runs", "Home Runs"];
+    var lst2 = [player.Name, player.position, player.Stats.Yrs, player.Stats.G, player.Stats.H, player.Stats.R, player.Stats.HR];
+
+    d3.select("#col-name")
+        .selectAll("th")
+        .data(lst1)
+        .text(function(d) { return d; })
+        .enter()
+        .append("th")
+        .text(function(d) { return d; });
+    d3.select("#col-values")
+        .selectAll("td")
+        .data(lst2)
+        .text(function(d) { return d; })
+        .enter()
+        .append("td")
+        .text(function(d) { return d; });
+}
+
 function create_vis(players, player_csv, election_csv)
 {
     var i;
@@ -131,6 +152,7 @@ function create_vis(players, player_csv, election_csv)
         .attr("y", function(player) { 
             return trajectory_y(player.last_vote)-5; 
         })
+        .on("click", show_player)
         .on("mouseover", function(player) {
             if (player._selected) {
                 lines[player.Name]
@@ -171,6 +193,7 @@ function create_vis(players, player_csv, election_csv)
         .attr("stroke-width", 2)
         .attr("stroke-opacity", 0.15)
         .attr("fill", "none")
+        .on("click", show_player)
         .on("mouseover", function(player) {
             if (player._selected) {
                 d3.select(this)

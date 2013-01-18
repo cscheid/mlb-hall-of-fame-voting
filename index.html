@@ -90,6 +90,10 @@ h2 {
   stroke: #666;
 }
 
+th {
+    text-align: left;
+}
+
 </style>
 <title>MLB Hall of Fame voting</title>
 </head>
@@ -101,12 +105,22 @@ h2 {
   <script src="player.js"></script>
   <script src="index.js"></script>
   <h2>MLB Hall of Fame voting</h2><hr>
-  <div>Player Name: <input type="text" id="searchbox"></div>
   <div>
-    View:
-    <input type="radio" name="vistype" id="show-trajectory" value="trajectory" checked>Trajectory</input>
-    <input type="radio" name="vistype" id="show-histogram" value="histogram">Outcome</input>  </div>
-  <div>
+    <div style="float: left">
+      Player Name: <input type="text" id="searchbox"></div>
+    </div>
+    <div style="float: left; padding-left: 2em">
+      <table id="player-stats">
+	<tr id="col-name"><th>Name</th><th>Position</th><th>Years</th><th>Games</th><th>Hits</th><th>Runs</th><th>Home Runs</th></tr>
+	<tr id="col-values"></tr>
+      </table>
+    </div>
+    <div style="clear: both"/>
+  <!-- <div> -->
+  <!--     View: -->
+  <!--     <input type="radio" name="vistype" id="show-trajectory" value="trajectory" checked>Trajectory</input> -->
+  <!--     <input type="radio" name="vistype" id="show-histogram" value="histogram">Outcome</input>  </div> -->
+  <!-- <div> -->
     <span id="main"></span>
     <span id="induction_legend"></span>
     <span id="position_legend"></span>
