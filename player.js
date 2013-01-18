@@ -2,6 +2,7 @@ function create_player(entry)
 {
     return {
         Name: entry.Name,
+        Pos: entry.position,
         Stats: entry,
         _lowercase_name: entry.Name.toLowerCase(),
         Appearances: []

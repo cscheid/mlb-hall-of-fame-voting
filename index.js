@@ -13,10 +13,15 @@ var charts = [];
 var dimensions = [];
 var groups = [];
 var lines = {};
+var dots = {};
 _debugging = false;
 
 function highlight_on(player)
 {
+    dots[player.Name]
+        .attr("stroke", "black")
+        .attr("stroke-width", 2);
+
     lines[player.Name]
         .attr("stroke-opacity", 1)
         .attr("stroke-width", 3);
@@ -24,6 +29,10 @@ function highlight_on(player)
 
 function highlight_off(player)
 {
+    dots[player.Name]
+        .attr("stroke", "none")
+        .attr("stroke-width", 0);
+
     lines[player.Name]
         .attr("stroke-opacity", 0.15)
         .attr("stroke-width", 2);
@@ -31,57 +40,30 @@ function highlight_off(player)
 
 function toggle_player(player)
 {
-    var lst1;
-    var lst2;
-
-    if (player.position === "P") {
-        lst1 = ["Name", "Pos", "Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO"];
-        lst2 = [player.Name, player.position, player.Stats.Yrs, player.Stats.G, player.Stats.WAR, 
-                player.Stats.W, player.Stats.L, player.Stats.ERA, 
-                player.Stats.WHIP, player.Stats.GS, player.Stats.SV, player.Stats.IP, player.Stats["H.1"], player.Stats["HR.1"], player.Stats["BB.1"], player.Stats["SO"]];
-    } else {
-        lst1 = ["Name", "Pos", "Yrs", "G", "WAR", "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus"];    
-        lst2 = [player.Name, player.position, player.Stats.Yrs, player.Stats.G, player.Stats.WAR, 
-                player.Stats.AB, player.Stats.R,
-                player.Stats.H, player.Stats.HR, player.Stats.RBI, player.Stats.SB, player.Stats.BB, player.Stats.BA, 
-                player.Stats.OBP, player.Stats.SLG, player.Stats.OPS, player.Stats["OPS.Plus"]];
-    }
+    var lst = ["Name", "Pos", "Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO",
+               "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus"];
 
     if (clicked_player !== undefined)
         highlight_off(clicked_player);
     if (clicked_player === player) {
         clicked_player = undefined;
-        d3.select("#col-name")
-            .selectAll("th")
-            .remove();
-        d3.select("#col-values")
-            .selectAll("td")
-            .remove();
+        _.each(lst, function(c) {
+            debugger;
+            document.getElementById("player-"+c).innerHTML = "-";
+        });
     } else {
         clicked_player = player;
-        var s = d3.select("#col-name")
-            .selectAll("th")
-            .data(lst1)
-            .text(function(d) { return d; });
-        s.enter()
-            .append("th")
-            .text(function(d) { return d; });
-        s.exit()
-            .remove();
-
-        s = d3.select("#col-values")
-            .selectAll("td")
-            .data(lst2)
-            .text(function(d) { return d; });
-        s.enter()
-            .append("td")
-            .text(function(d) { return d; });
-        s.exit()
-            .remove();
-
         highlight_on(clicked_player);
+        _.each(lst, function(c) {
+            debugger;
+            var v = player.Stats[c];
+            if (v === undefined)
+                v = player[c];
+            else if (v === "NA")
+                v = "";
+            document.getElementById("player-"+c).innerHTML = v;
+        });
     }
-
     renderAll();
 }
 
@@ -90,8 +72,6 @@ function render(method) {
 }
 
 function renderAll() {
-    if (_debugging)
-        debugger;
     chart.each(render);
     d3.select("#active").text(formatNumber(all.value()));
     var selection = dimensions[0].top(Infinity);
@@ -223,6 +203,7 @@ function create_vis(players, player_csv, election_csv)
         .attr("width", 10)
         .attr("height", 10)
 	.attr("fill", function(player) {
+            dots[player.Name] = d3.select(this);
 	    var la = player.Stats.method;
             return colors(Number(la));
 	})
@@ -430,7 +411,6 @@ function create_vis(players, player_csv, election_csv)
     $("#searchbox").bind("input", function(event) {
         name_box_value = event.target.value.toLowerCase();
         name_dimension.filter(function(d) {
-            debugger;
             return name_box_value === "" || (d.indexOf(name_box_value) !== -1);
         });
         renderAll();
@@ -473,12 +453,11 @@ function create_vis(players, player_csv, election_csv)
         renderAll();
     };
 
-    var stats = ["HOFm", "HOFs", "Yrs", "WAR", "WAR7", "JAWS", "Jpos", "G", "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus", "W", "L", "ERA", "ERA.Plus"];
+    var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus"];
     // var stats = ["ERA"];
-    var bounds = {"ERA": { min: 0, max: 6 } };
+    var bounds = {"ERA": { min: 1.5, max: 5 } };
 
     _.each(stats, function(stat) {
-        debugger;
         var min, max;
         var select = function(d) {
             var t = Number(d[stat]);
@@ -548,12 +527,10 @@ function barChart() {
         var width = x.range()[1],
             height = y.range()[1];
 
-        debugger;
-        var g = group.top(3);
+        var g = group.top(2);
         var v;
-        for (var i=0; i<3; ++i) {
-            if (g[i].Key !== Infinity &&
-                g[i].Key !== -Infinity) {
+        for (var i=0; i<2; ++i) {
+            if (g[i].key !== Infinity) {
                 v = g[i].value;
                 break;
             }
