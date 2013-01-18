@@ -1,12 +1,3 @@
-- "somehow mark those players that get into the Hall eventually by other means - I would like to quickly see the players that got the most votes and never got in (Gil Hodges, I think is the standard bearer here)." -Chris
- -- done.
-
-- "mouseover line identiifcation (kenny said this is coming soon…)" -Chris
- -- add name label with the mouseover line identification
-
-- "some gridlines...X and Y axis (every decade at least)" -Chris
- -- to do. X every 10 years, Y every 10 percentage points
-
 - "some weird artifacts....Warren Spahn appears to start at zero (dont think that is true).." -Chris
  -- explain Spahn, Lefty Grove, maybe Gehrig, Clemente, too:
    -- Kenny to correct Lefty Grove in the data (remove 1960 votes from data)
@@ -14,13 +5,7 @@
    -- For Gehrig, Clemente, consider appending explanation to name, or add two short footnotes. Might need footnote for (1) negro leagues committee, and (2) runoff election, in addition to the Gehrig and Clemente explanations (because they got in via special election).
 
 
-
-- Add filter/legend for:
- 1. Method of Election (-- done)	
- 2. Position (-- done)
-
 - Add histograms for:
- 1. 10 statistical categories: HR, Hits, BA, SB, RBI, WAR, OPS, Wins, Saves, K (for pitchers)
  2. Initial Vote %
  3. Final Vote %
  4. Min vote percentage
@@ -29,19 +14,7 @@
  7. Last Year on ballot
  8. Number of years on ballot
 
-
-- Add line to show player statistics:
-  - Include: 
-  - For all positions: position, Yrs, WAR
-  - For batters (any position except "P"): G, AB, R, H, HR, RBI, SB, BB, BA, OBP, SLG, OPS, OPS.Plus
-  - For pitchers (position "P") W, L, ERA, ERA.Plus, WHIP, G.1, GS, SV, IP, H.1, HR.1, BB.1, SO
-
-
-- hide the lines on queries (now only points are hidden). Also hide the mouseovers (so you don't display a name or line for a player who isn't selected).
-
 - colors: switch orange and blue? And maybe add a toggle to choose whether to color points by method of induction vs. position.
-
-- For "Outcome" view, remove lines, remove red and green horizontal lines, change y axis, and try to collapse down the histogram upon selection of subset of players.
 
 
 

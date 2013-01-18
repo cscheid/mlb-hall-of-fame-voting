@@ -20,7 +20,6 @@ function create_players(csv, csv2) {
             player = create_player(entry);
             players[player.Name] = player;
         }
-        // player.Appearances.push(entry);
     }
 
     for (i=0; i<csv2.length; ++i) {
@@ -35,12 +34,12 @@ function create_players(csv, csv2) {
             a2 = Number(a2.Year);
             return a1 - a2;
         });
+        var first_appearance = player.Appearances[0];
         var last_appearance = player.Appearances[player.Appearances.length-1];
+        player.first_appearance = Number(first_appearance.Year);
         player.last_appearance = Number(last_appearance.Year);
-        var v = last_appearance["pct"];
-        player.last_vote = Number(v);
-        if (isNaN(player.last_vote))
-            player.last_vote = 100; // only happens for Lou Gehrig
+        player.first_vote = Number(first_appearance["pct"]) || 100; // only happens for Lou Gehrig
+        player.last_vote = Number(last_appearance["pct"]) || 100; // only happens for Lou Gehrig
         player.position = player.Stats.position;
     }
     var lst = [];
