@@ -5,6 +5,8 @@ var largest_histogram_count = 0;
 var players;
 var cf, all, war, wars, jaws, jawss, chart, hr, hrs;
 var formatNumber = d3.format(",d");
+var player_dots;
+var player_paths;
 
 function create_vis(players)
 {
@@ -82,6 +84,8 @@ function create_vis(players)
 
     var box1 = svg.append("g");
     var box2 = svg.append("g");
+    player_dots = box2;
+    player_paths = box1;
 
     var lines = {};
 
@@ -653,8 +657,20 @@ d3.csv("player_data.csv", function(error, player_csv) {
 
         function renderAll() {
             chart.each(render);
-            // list.each(render);
             d3.select("#active").text(formatNumber(all.value()));
+            var selection = dimensions[0].top(Infinity);
+            var shown = {};
+            for (var i=0; i<selection.length; ++i) {
+                shown[selection[i].Name] = 1;
+            }
+            player_dots.selectAll("rect")
+                .attr("display", function(d) {
+                    return shown[d.Name] ? "inline" : "none";
+                });
+            player_paths.selectAll("path")
+                .attr("display", function(d) {
+                    return shown[d.Name] ? "inline" : "none";
+                });
         }
 
         var charts = [];
@@ -700,6 +716,5 @@ d3.csv("player_data.csv", function(error, player_csv) {
             .data(charts)
             .each(function(chart) { chart.on("brush", renderAll).on("brushend", renderAll); });
         renderAll();
-
     });
 });
