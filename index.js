@@ -455,7 +455,10 @@ function create_vis(players, player_csv, election_csv)
 
     var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus"];
     // var stats = ["ERA"];
-    var bounds = {"ERA": { min: 1.5, max: 5 } };
+    var bounds = {"ERA": { min: 1.5, max: 5 },
+                  "WHIP": { min: 0.85, max: 1.75 },
+                  "WAR": { min: 0, max: 125 }
+                 };
 
     _.each(stats, function(stat) {
         var min, max;
