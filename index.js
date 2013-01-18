@@ -7,9 +7,22 @@ var cf, all, war, wars, jaws, jawss, chart, hr, hrs;
 var formatNumber = d3.format(",d");
 var player_dots;
 var player_paths;
+var induction_method_dimension, player_position_dimension;
 
-function create_vis(players)
+function create_vis(players, player_csv, election_csv)
 {
+    var i;
+
+    cf = crossfilter(player_csv);
+    all = cf.groupAll();
+
+    induction_method_dimension = cf.dimension(function(d) {
+        return Number(d.method);
+    });
+    player_position_dimension = cf.dimension(function(d) {
+        return d.position;
+    });
+
     var svg = d3.select("#main").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom);
@@ -134,7 +147,6 @@ function create_vis(players)
             return player.Name;
         });
 
-    // for (var i=0; i<players.length; ++i) {
     var line = d3.svg.line()
         .x(function(a) { return x(Number(a.Year)); })
         .y(function(a) { 
@@ -150,9 +162,6 @@ function create_vis(players)
         .attr("d", function(player) { 
             lines[player.Name] = d3.select(this);
             var x = line(player.Appearances); 
-            if (x.indexOf("NaN") !== -1) {
-                debugger;
-            }
             return x;
         })
         .attr("stroke", "black")
@@ -201,7 +210,7 @@ function create_vis(players)
 
     var method_query_value = 0;
     function method_query(d) {
-        var method = d.Stats.method;
+        var method = d.method;
         return method_query_value === 0 || ((1 << Number(method)) & method_query_value);
     }
 
@@ -213,12 +222,8 @@ function create_vis(players)
         position_mask[positions[i]] = 1 << i;
 
     var position_query_value = 0;
-    function position_query(d) {
-        var position = position_mask[d.position];
-        return position_query_value === 0 || (position & position_query_value);
-    }
 
-    var query_list = [name_query, method_query, position_query];
+    var query_list = [name_query];
 
     //////////////////////////////////////////////////////////////////////////
     // induction legend
@@ -244,7 +249,11 @@ function create_vis(players)
     var induction_legend_rects, induction_legend_texts;
     function update_induction_legend_query(d, i) {
         method_query_value = method_query_value ^ (1 << i);
+        induction_method_dimension.filter(function(d) {
+            return method_query_value === 0 || ((1 << d) & method_query_value);
+        });
         refresh_query();
+        renderAll();
         induction_legend_rects.transition()
             .attr("fill-opacity", function(d, i) { 
                 return (method_query_value === 0 || ((1 << i) & method_query_value)) ?
@@ -297,7 +306,11 @@ function create_vis(players)
     var position_legend_rects, position_legend_texts;
     function update_position_legend_query(d, i) {
         position_query_value = position_query_value ^ (1 << i);
+        player_position_dimension.filter(function(d) {
+            return position_query_value === 0 || (position_mask[d] & position_query_value);
+        });
         refresh_query();
+        renderAll();
         position_legend_rects.transition()
             .attr("fill-opacity", function(d, i) { 
                 return (position_query_value === 0 || ((1 << i) & position_query_value)) ?
@@ -338,41 +351,6 @@ function create_vis(players)
                     return false;
             return true;
         }
-
-        box2.selectAll("rect")
-            .style("display", function(d) {
-                var r = query(d);
-                d._selected = r;
-                return "inline";
-            })
-            .transition()
-            .attr("fill-opacity", function(d) {
-                return d._selected ? 1.0 : 0.0;
-            }).attr("stroke-opacity", function(d) {
-                return d._selected ? 1.0 : 0.0;
-            })
-            .transition()
-            .duration(0)
-            .style("display", function(d) {
-                return d._selected ? "inline" : "none";
-            })
-        ;
-        box1.selectAll("path")
-            .style("display", function(d) {
-                var r = query(d);
-                d._selected = r;
-                return "inline";
-            })
-            .transition()
-            .attr("stroke-opacity", function(d) {
-                return d._selected ? 0.15 : 0.0;
-            })
-            .transition()
-            .duration(0)
-            .style("display", function(d) {
-                return d._selected ? "inline" : "none";
-            })
-        ;
     }
 
     $("#searchbox").bind("input", function(event) {
@@ -405,6 +383,83 @@ function create_vis(players)
             .attr("ry", 0)
         ;
     });
+
+
+    window.filter = function(filters) {
+        filters.forEach(function(d, i) { charts[i].filter(d); });
+        renderAll();
+    };
+
+    window.reset = function(i) {
+        charts[i].filter(null);
+        renderAll();
+    };
+
+    function render(method) {
+        d3.select(this).call(method);
+    }
+
+    function renderAll() {
+        chart.each(render);
+        // d3.select("#active").text(formatNumber(all.value()));
+        var selection = dimensions[0].top(Infinity);
+        var shown = {};
+        for (var i=0; i<selection.length; ++i) {
+            shown[selection[i].Name] = 1;
+        }
+        player_dots.selectAll("rect")
+            .style("display", function(d) {
+                return shown[d.Name] ? "inline" : "none";
+            });
+        player_paths.selectAll("path")
+            .style("display", function(d) {
+                return shown[d.Name] ? "inline" : "none";
+            });
+    }
+
+    var charts = [];
+    var dimensions = [];
+    var groups = [];
+
+    var stats = ["HOFm", "HOFs", "Yrs", "WAR", "WAR7", "JAWS", "Jpos", "G", "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus", "W", "L", "ERA", "ERA.Plus"];
+    _.each(stats, function(stat) {
+        var select = function(d) {
+            return Number(d[stat]);
+        };
+        var dimension = cf.dimension(select);
+        var vs = _.map(player_csv, select);
+        var min = d3.min(vs), max = d3.max(vs), range = max - min;
+        var group = dimension.group(function(d) {
+            var t = (d - min) / range * 10;
+            return Math.floor(t) * range / 10 + min;
+        });
+        dimensions.push(dimension);
+        groups.push(group);
+        var c = barChart()
+            .dimension(dimension)
+            .group(group)
+            .x(d3.scale.linear()
+               .domain([min, max])
+               .range([0, 10 * 10]));
+        c._stat = stat;
+        charts.push(c);
+    });
+
+    d3.select("#charts")
+        .selectAll(".chart")
+        .data(charts)
+        .enter()
+        .append("div")
+        .attr("id", function(d) { return d._stat + "-chart"; })
+        .attr("class", "chart")
+        .append("div")
+        .attr("class", "title")
+        .text(function(d) { return d._stat; });
+
+    var chart = d3.selectAll(".chart")
+        .data(charts)
+        .each(function(chart) { chart.on("brush", renderAll).on("brushend", renderAll); });
+    renderAll();
 }
 
 // from github.com/square/crossfilter
@@ -614,107 +669,6 @@ function barChart() {
 d3.csv("player_data.csv", function(error, player_csv) {
     d3.csv("election_data.csv", function(error, election_csv) {
         players = create_players(player_csv, election_csv);
-
-        cf = crossfilter(player_csv);
-        all = cf.groupAll();
-
-        war = cf.dimension(function(d) { return Number(d.WAR); });
-        wars = war.group(function(d) {
-            return Math.floor((d + 6.7) / 16) * 16;
-        });
-
-        jaws = cf.dimension(function(d) { 
-            var t = Number(d.JAWS); 
-            return (isNaN(t)) ? undefined : t; 
-        });
-        jawss = jaws.group(function(d) {
-            return Math.floor((d + 2.6) / 13) * 13;
-        });
-
-        hr = cf.dimension(function(d) { 
-            var t = Number(d.HR); 
-            return (isNaN(t)) ? 0 : t; 
-        }); 
-        hrs = hr.group(function(d) {
-            return Math.floor(d / 76) * 76;
-        });
-        
-        create_vis(players);
-
-        window.filter = function(filters) {
-            filters.forEach(function(d, i) { charts[i].filter(d); });
-            renderAll();
-        };
-
-        window.reset = function(i) {
-            charts[i].filter(null);
-            renderAll();
-        };
-
-        function render(method) {
-            d3.select(this).call(method);
-        }
-
-        function renderAll() {
-            chart.each(render);
-            d3.select("#active").text(formatNumber(all.value()));
-            var selection = dimensions[0].top(Infinity);
-            var shown = {};
-            for (var i=0; i<selection.length; ++i) {
-                shown[selection[i].Name] = 1;
-            }
-            player_dots.selectAll("rect")
-                .attr("display", function(d) {
-                    return shown[d.Name] ? "inline" : "none";
-                });
-            player_paths.selectAll("path")
-                .attr("display", function(d) {
-                    return shown[d.Name] ? "inline" : "none";
-                });
-        }
-
-        var charts = [];
-        var dimensions = [];
-        var groups = [];
-
-        var stats = ["HOFm", "HOFs", "Yrs", "WAR", "WAR7", "JAWS", "Jpos", "G", "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus", "W", "L", "ERA", "ERA.Plus"];
-        _.each(stats, function(stat) {
-            var select = function(d) {
-                return Number(d[stat]);
-            };
-            var dimension = cf.dimension(select);
-            var vs = _.map(player_csv, select);
-            var min = d3.min(vs), max = d3.max(vs), range = max - min;
-            var group = dimension.group(function(d) {
-                var t = (d - min) / range * 10;
-                return Math.floor(t) * range / 10 + min;
-            });
-            dimensions.push(dimension);
-            groups.push(group);
-            var c = barChart()
-                        .dimension(dimension)
-                        .group(group)
-                        .x(d3.scale.linear()
-                           .domain([min, max])
-                           .range([0, 10 * 10]));
-            c._stat = stat;
-            charts.push(c);
-        });
-
-        d3.select("#charts")
-            .selectAll(".chart")
-            .data(charts)
-            .enter()
-            .append("div")
-            .attr("id", function(d) { return d._stat + "-chart"; })
-            .attr("class", "chart")
-            .append("div")
-            .attr("class", "title")
-            .text(function(d) { return d._stat; });
-
-        var chart = d3.selectAll(".chart")
-            .data(charts)
-            .each(function(chart) { chart.on("brush", renderAll).on("brushend", renderAll); });
-        renderAll();
+        create_vis(players, player_csv, election_csv);
     });
 });
