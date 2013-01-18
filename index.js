@@ -13,6 +13,7 @@ var charts = [];
 var dimensions = [];
 var groups = [];
 var lines = {};
+_debugging = false;
 
 function highlight_on(player)
 {
@@ -89,7 +90,10 @@ function render(method) {
 }
 
 function renderAll() {
+    if (_debugging)
+        debugger;
     chart.each(render);
+    d3.select("#active").text(formatNumber(all.value()));
     var selection = dimensions[0].top(Infinity);
     var shown = {};
     for (var i=0; i<selection.length; ++i) {
@@ -110,6 +114,8 @@ function create_vis(players, player_csv, election_csv)
     var i;
 
     cf = crossfilter(player_csv);
+    d3.selectAll("#total")
+        .text(formatNumber(cf.size()));
     all = cf.groupAll();
 
     name_dimension = cf.dimension(function(d) {
@@ -467,15 +473,29 @@ function create_vis(players, player_csv, election_csv)
         renderAll();
     };
 
-
     var stats = ["HOFm", "HOFs", "Yrs", "WAR", "WAR7", "JAWS", "Jpos", "G", "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus", "W", "L", "ERA", "ERA.Plus"];
+    // var stats = ["ERA"];
+    var bounds = {"ERA": { min: 0, max: 6 } };
+
     _.each(stats, function(stat) {
+        debugger;
+        var min, max;
         var select = function(d) {
-            return Number(d[stat]);
+            var t = Number(d[stat]);
+            return isNaN(t) ? Infinity : Math.max(min, Math.min(max, t));
         };
+        if (_.isUndefined(bounds[stat])) {
+            min = -Infinity;
+            max = Infinity;
+            var vs = _.map(player_csv, select);
+            min = d3.min(vs, function(i) { return (i === Infinity) ? NaN:i; });
+            max = d3.max(vs, function(i) { return (i === Infinity) ? NaN:i; });
+        } else {
+            min = bounds[stat].min;
+            max = bounds[stat].max;
+        } 
+        var range = max - min;
         var dimension = cf.dimension(select);
-        var vs = _.map(player_csv, select);
-        var min = d3.min(vs), max = d3.max(vs), range = max - min;
         var group = dimension.group(function(d) {
             var t = (d - min) / range * 10;
             return Math.floor(t) * range / 10 + min;
@@ -486,8 +506,8 @@ function create_vis(players, player_csv, election_csv)
             .dimension(dimension)
             .group(group)
             .x(d3.scale.linear()
-               .domain([min, max])
-               .range([0, 10 * 10]));
+               .domain([min, min + (range * 1.1)])
+               .range([0, 10 * 11]));
         c._stat = stat;
         charts.push(c);
     });
@@ -513,7 +533,7 @@ function create_vis(players, player_csv, election_csv)
 function barChart() {
     if (!barChart.id) barChart.id = 0;
 
-    var margin = {top: 10, right: 10, bottom: 10, left: 50},
+    var margin = {top: 10, right: 10, bottom: 20, left: 50},
         x,
         y = d3.scale.linear().range([0, 100]),
         id = barChart.id++,
@@ -528,7 +548,19 @@ function barChart() {
         var width = x.range()[1],
             height = y.range()[1];
 
-        y.domain([0, group.top(1)[0].value]);
+        debugger;
+        var g = group.top(3);
+        var v;
+        for (var i=0; i<3; ++i) {
+            if (g[i].Key !== Infinity &&
+                g[i].Key !== -Infinity) {
+                v = g[i].value;
+                break;
+            }
+        }
+        if (_.isUndefined(v))
+            throw "internal error";
+        y.domain([0, v]);
 
         div.each(function() {
             var div = d3.select(this),
