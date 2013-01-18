@@ -8,26 +8,101 @@ var formatNumber = d3.format(",d");
 var player_dots;
 var player_paths;
 var induction_method_dimension, player_position_dimension, name_dimension;
+var clicked_player;
+var charts = [];
+var dimensions = [];
+var groups = [];
+var lines = {};
 
-function show_player(player)
+function highlight_on(player)
 {
-    var lst1 = ["Name", "Position", "Years", "Games", "Hits", "Runs", "Home Runs"];
-    var lst2 = [player.Name, player.position, player.Stats.Yrs, player.Stats.G, player.Stats.H, player.Stats.R, player.Stats.HR];
+    lines[player.Name]
+        .attr("stroke-opacity", 1)
+        .attr("stroke-width", 3);
+}
 
-    d3.select("#col-name")
-        .selectAll("th")
-        .data(lst1)
-        .text(function(d) { return d; })
-        .enter()
-        .append("th")
-        .text(function(d) { return d; });
-    d3.select("#col-values")
-        .selectAll("td")
-        .data(lst2)
-        .text(function(d) { return d; })
-        .enter()
-        .append("td")
-        .text(function(d) { return d; });
+function highlight_off(player)
+{
+    lines[player.Name]
+        .attr("stroke-opacity", 0.15)
+        .attr("stroke-width", 2);
+}
+
+function toggle_player(player)
+{
+    var lst1;
+    var lst2;
+
+    if (player.position === "P") {
+        lst1 = ["Name", "Pos", "Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO"];
+        lst2 = [player.Name, player.position, player.Stats.Yrs, player.Stats.G, player.Stats.WAR, 
+                player.Stats.W, player.Stats.L, player.Stats.ERA, 
+                player.Stats.WHIP, player.Stats.GS, player.Stats.SV, player.Stats.IP, player.Stats["H.1"], player.Stats["HR.1"], player.Stats["BB.1"], player.Stats["SO"]];
+    } else {
+        lst1 = ["Name", "Pos", "Yrs", "G", "WAR", "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus"];    
+        lst2 = [player.Name, player.position, player.Stats.Yrs, player.Stats.G, player.Stats.WAR, 
+                player.Stats.AB, player.Stats.R,
+                player.Stats.H, player.Stats.HR, player.Stats.RBI, player.Stats.SB, player.Stats.BB, player.Stats.BA, 
+                player.Stats.OBP, player.Stats.SLG, player.Stats.OPS, player.Stats["OPS.Plus"]];
+    }
+
+    if (clicked_player !== undefined)
+        highlight_off(clicked_player);
+    if (clicked_player === player) {
+        clicked_player = undefined;
+        d3.select("#col-name")
+            .selectAll("th")
+            .remove();
+        d3.select("#col-values")
+            .selectAll("td")
+            .remove();
+    } else {
+        clicked_player = player;
+        var s = d3.select("#col-name")
+            .selectAll("th")
+            .data(lst1)
+            .text(function(d) { return d; });
+        s.enter()
+            .append("th")
+            .text(function(d) { return d; });
+        s.exit()
+            .remove();
+
+        s = d3.select("#col-values")
+            .selectAll("td")
+            .data(lst2)
+            .text(function(d) { return d; });
+        s.enter()
+            .append("td")
+            .text(function(d) { return d; });
+        s.exit()
+            .remove();
+
+        highlight_on(clicked_player);
+    }
+
+    renderAll();
+}
+
+function render(method) {
+    d3.select(this).call(method);
+}
+
+function renderAll() {
+    chart.each(render);
+    var selection = dimensions[0].top(Infinity);
+    var shown = {};
+    for (var i=0; i<selection.length; ++i) {
+        shown[selection[i].Name] = 1;
+    }
+    player_dots.selectAll("rect")
+        .style("display", function(d) {
+            return shown[d.Name] || (d === clicked_player) ? "inline" : "none";
+        });
+    player_paths.selectAll("path")
+        .style("display", function(d) {
+            return shown[d.Name] || (d === clicked_player)  ? "inline" : "none";
+        });
 }
 
 function create_vis(players, player_csv, election_csv)
@@ -124,8 +199,6 @@ function create_vis(players, player_csv, election_csv)
     player_dots = box2;
     player_paths = box1;
 
-    var lines = {};
-
     var colors = d3.scale.category10();
 
     // var colors = ["black", "green", "blue", "purple", "orange", "red"];
@@ -152,20 +225,11 @@ function create_vis(players, player_csv, election_csv)
         .attr("y", function(player) { 
             return trajectory_y(player.last_vote)-5; 
         })
-        .on("click", show_player)
-        .on("mouseover", function(player) {
-            if (player._selected) {
-                lines[player.Name]
-                    .attr("stroke-opacity", 1)
-                    .attr("stroke-width", 3);
-            }
-        })
-        .on("mouseout", function(player){ 
-            if (player._selected) {
-                lines[player.Name]
-                    .attr("stroke-opacity", 0.15)
-                    .attr("stroke-width", 2);
-            }
+        .on("click", toggle_player)
+        .on("mouseover", highlight_on)
+        .on("mouseout", function(player) { 
+            if (clicked_player !== player)
+                highlight_off(player);
         })
 	.append("svg:title")
         .text(function(player) {
@@ -193,20 +257,11 @@ function create_vis(players, player_csv, election_csv)
         .attr("stroke-width", 2)
         .attr("stroke-opacity", 0.15)
         .attr("fill", "none")
-        .on("click", show_player)
-        .on("mouseover", function(player) {
-            if (player._selected) {
-                d3.select(this)
-                    .attr("stroke-opacity", 1)
-                    .attr("stroke-width", 3);
-            }
-        })
+        .on("click", toggle_player)
+        .on("mouseover", highlight_on)
         .on("mouseout", function(player) {
-            if (player._selected) {
-                d3.select(this)
-                    .attr("stroke-opacity", 0.15)
-                    .attr("stroke-width", 2);
-            }
+            if (clicked_player !== player)
+                highlight_off(player);
         })
         .append("svg:title")
         .text(function(player) {
@@ -412,31 +467,6 @@ function create_vis(players, player_csv, election_csv)
         renderAll();
     };
 
-    function render(method) {
-        d3.select(this).call(method);
-    }
-
-    function renderAll() {
-        chart.each(render);
-        // d3.select("#active").text(formatNumber(all.value()));
-        var selection = dimensions[0].top(Infinity);
-        var shown = {};
-        for (var i=0; i<selection.length; ++i) {
-            shown[selection[i].Name] = 1;
-        }
-        player_dots.selectAll("rect")
-            .style("display", function(d) {
-                return shown[d.Name] ? "inline" : "none";
-            });
-        player_paths.selectAll("path")
-            .style("display", function(d) {
-                return shown[d.Name] ? "inline" : "none";
-            });
-    }
-
-    var charts = [];
-    var dimensions = [];
-    var groups = [];
 
     var stats = ["HOFm", "HOFs", "Yrs", "WAR", "WAR7", "JAWS", "Jpos", "G", "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus", "W", "L", "ERA", "ERA.Plus"];
     _.each(stats, function(stat) {
@@ -473,7 +503,7 @@ function create_vis(players, player_csv, election_csv)
         .attr("class", "title")
         .text(function(d) { return d._stat; });
 
-    var chart = d3.selectAll(".chart")
+    chart = d3.selectAll(".chart")
         .data(charts)
         .each(function(chart) { chart.on("brush", renderAll).on("brushend", renderAll); });
     renderAll();

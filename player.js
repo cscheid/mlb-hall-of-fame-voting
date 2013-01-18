@@ -4,7 +4,6 @@ function create_player(entry)
         Name: entry.Name,
         Stats: entry,
         _lowercase_name: entry.Name.toLowerCase(),
-        _selected: true,
         Appearances: []
     };
 }
