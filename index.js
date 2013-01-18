@@ -278,11 +278,22 @@ function create_vis(players, player_csv, election_csv)
     }
 
     var positions = [
-        "P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "OF", "DH", "Manager"
+        "P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "OF", "DH", "Manager", "Batters"
     ];
     var position_mask = {};
-    for (i=0; i<positions.length; ++i)
+    for (i=0; i<positions.length-1; ++i)
         position_mask[positions[i]] = 1 << i;
+    position_mask["Batters"] = 
+        position_mask["C"] | 
+        position_mask["1B"] | 
+        position_mask["2B"] | 
+        position_mask["3B"] | 
+        position_mask["SS"] | 
+        position_mask["LF"] | 
+        position_mask["CF"] | 
+        position_mask["RF"] | 
+        position_mask["OF"] | 
+        position_mask["DH"];
 
     var position_query_value = 0;
 
@@ -365,19 +376,19 @@ function create_vis(players, player_csv, election_csv)
 
     var position_legend_rects, position_legend_texts;
     function update_position_legend_query(d, i) {
-        position_query_value = position_query_value ^ (1 << i);
+        position_query_value = position_query_value ^ position_mask[d];
         player_position_dimension.filter(function(d) {
             return position_query_value === 0 || (position_mask[d] & position_query_value);
         });
         renderAll();
         position_legend_rects.transition()
             .attr("fill-opacity", function(d, i) { 
-                return (position_query_value === 0 || ((1 << i) & position_query_value)) ?
+                return (position_query_value === 0 || (position_mask[d] & position_query_value)) ?
                     1.0 : 0.2;
             });
         position_legend_texts.transition()
             .attr("fill-opacity", function(d, i) { 
-                return (position_query_value === 0 || ((1 << i) & position_query_value)) ?
+                return (position_query_value === 0 || (position_mask[d] & position_query_value)) ?
                     1.0 : 0.2;
             });
     }
@@ -460,7 +471,12 @@ function create_vis(players, player_csv, election_csv)
         "BA": { min: 0, max: 0.4 },
         "W": { min: 0, max: 400 },
         "OBP": { min: 0, max: 0.48 },
-        "AB": { min: 0, max: 12000 }
+        "AB": { min: 0, max: 12000 },
+        "BB.1": { min: 0, max: 2000 },
+        "R": { min: 0, max: 2000 },
+        "SV": { min: 0, max: 370 },
+        "BB": { min: 0, max: 1900 },
+        "H.1": { min: 0, max: 5000 }
     };
 
     _.each(stats, function(stat) {
