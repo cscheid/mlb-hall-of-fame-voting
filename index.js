@@ -454,7 +454,13 @@ function create_vis(players, player_csv, election_csv)
         "SO": { min: 0, max: 3700 },
         "H": { min: 0, max: 3700 },
         "SB": { min: 0, max: 800 },
-        "IP": { min: 0, max: 5500 }
+        "IP": { min: 0, max: 5500 },
+        "WHIP": { min: 0.85, max: 1.75 },
+        "WAR": { min: 0, max: 125 },
+        "BA": { min: 0, max: 0.4 },
+        "W": { min: 0, max: 400 },
+        "OBP": { min: 0, max: 0.48 },
+        "AB": { min: 0, max: 12000 }
     };
 
     _.each(stats, function(stat) {
