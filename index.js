@@ -7,7 +7,7 @@ var cf, all, war, wars, jaws, jawss, chart, hr, hrs;
 var formatNumber = d3.format(",d");
 var player_dots;
 var player_paths;
-var induction_method_dimension, player_position_dimension;
+var induction_method_dimension, player_position_dimension, name_dimension;
 
 function create_vis(players, player_csv, election_csv)
 {
@@ -16,6 +16,9 @@ function create_vis(players, player_csv, election_csv)
     cf = crossfilter(player_csv);
     all = cf.groupAll();
 
+    name_dimension = cf.dimension(function(d) {
+        return d.Name.toLowerCase();
+    });
     induction_method_dimension = cf.dimension(function(d) {
         return Number(d.method);
     });
@@ -223,8 +226,6 @@ function create_vis(players, player_csv, election_csv)
 
     var position_query_value = 0;
 
-    var query_list = [name_query];
-
     //////////////////////////////////////////////////////////////////////////
     // induction legend
 
@@ -252,7 +253,6 @@ function create_vis(players, player_csv, election_csv)
         induction_method_dimension.filter(function(d) {
             return method_query_value === 0 || ((1 << d) & method_query_value);
         });
-        refresh_query();
         renderAll();
         induction_legend_rects.transition()
             .attr("fill-opacity", function(d, i) { 
@@ -309,7 +309,6 @@ function create_vis(players, player_csv, election_csv)
         player_position_dimension.filter(function(d) {
             return position_query_value === 0 || (position_mask[d] & position_query_value);
         });
-        refresh_query();
         renderAll();
         position_legend_rects.transition()
             .attr("fill-opacity", function(d, i) { 
@@ -344,18 +343,13 @@ function create_vis(players, player_csv, election_csv)
     position_legend_rects = position_legend.selectAll("rect");
     position_legend_texts = position_legend.selectAll("text");
 
-    function refresh_query() {
-        function query(d) {
-            for (var i=0; i<query_list.length; ++i)
-                if (!query_list[i](d))
-                    return false;
-            return true;
-        }
-    }
-
     $("#searchbox").bind("input", function(event) {
         name_box_value = event.target.value.toLowerCase();
-        refresh_query();
+        name_dimension.filter(function(d) {
+            debugger;
+            return name_box_value === "" || (d.indexOf(name_box_value) !== -1);
+        });
+        renderAll();
     });
 
     $("#show-trajectory").click(function() {
