@@ -187,11 +187,6 @@ function create_vis(players, player_csv, election_csv)
 
     var colors = d3.scale.category10();
 
-    // var colors = ["black", "green", "blue", "purple", "orange", "red"];
-    // var colors = d3.scale.ordinal()
-    //     .domain([0, 1, 2, 3, 4, 5])
-    //     .range(["black", "green", "blue", "purple", "orange", "red"]);
-
     box2.selectAll("rect")
         .data(players)
         .enter()
@@ -454,11 +449,19 @@ function create_vis(players, player_csv, election_csv)
     };
 
     var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus"];
-    // var stats = ["ERA"];
-    var bounds = {"ERA": { min: 1.5, max: 5 },
-                  "WHIP": { min: 0.85, max: 1.75 },
-                  "WAR": { min: 0, max: 125 }
-                 };
+    var bounds = {
+        "ERA": { min: 1.5, max: 5 },
+        "SO": { min: 0, max: 3700 },
+        "H": { min: 0, max: 3700 },
+        "SB": { min: 0, max: 800 },
+        "IP": { min: 0, max: 5500 },
+        "WHIP": { min: 0.85, max: 1.75 },
+        "WAR": { min: 0, max: 125 },
+        "BA": { min: 0, max: 0.4 },
+        "W": { min: 0, max: 400 },
+        "OBP": { min: 0, max: 0.48 },
+        "AB": { min: 0, max: 12000 }
+    };
 
     _.each(stats, function(stat) {
         var min, max;
