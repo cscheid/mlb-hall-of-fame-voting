@@ -231,6 +231,7 @@ function create_vis(obj, player_csv, election_csv)
     player_paths = box1;
 
     var colors = d3.scale.category10();
+    colors.domain([1,0,4,3,5,2,6,7]);
 
     box2.selectAll("rect")
         .data(players)
@@ -393,7 +394,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var induction_legend = d3.select("#induction_legend").append("svg")
         .attr("width", (width / 10) * 1.5)
-        .attr("height", (margin.top + height + margin.bottom) * 0.23);
+        .attr("height", (margin.top + height + margin.bottom) * 0.26);
 
     var induction_legend_items = induction_legend.selectAll("g")
         .data(["Not yet inducted",
@@ -407,7 +408,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var induction_legend_y = d3.scale.linear()
         .domain([0, 6])
-        .range([5, 5 + 6 * 20]);
+        .range([5, 5 + 6 * 17]);
 
     var induction_legend_rects, induction_legend_texts;
 
@@ -473,7 +474,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var position_legend_y = d3.scale.linear()
         .domain([0, positions.length])
-        .range([5, 5 + positions.length * 20]);
+        .range([5, 5 + positions.length * 17]);
 
     var position_legend_rects, position_legend_texts;
 
@@ -690,6 +691,8 @@ function barChart() {
 
                 g.selectAll(".foreground.bar")
                     .attr("clip-path", "url(#clip-" + id + ")");
+
+                axis.ticks(5);
 
                 g.append("g")
                     .attr("class", "axis")
