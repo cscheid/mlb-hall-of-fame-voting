@@ -19,10 +19,14 @@ var trajectory_brush;
 var refresh_trajectory_brush;
 var redraw_induction_legend_query;
 var redraw_position_legend_query;
+var _debugging = false;
+
+//////////////////////////////////////////////////////////////////////////////
 
 function state_url()
 {
-    return location.origin + location.pathname + "#state=" + $.param({ query: query_state });
+    return location.origin + location.pathname + 
+        "#state=" + $.param({ query: query_state });
 }
 
 function save_query_state()
@@ -120,17 +124,22 @@ function toggle_player(player)
 
 function renderAll() {
     chart.each(function(method) { d3.select(this).call(method); });
-    d3.select("#active").text(formatNumber(all.value()));
+    if (_debugging)
+        debugger;
     var selection = dimensions[0].top(Infinity);
     var shown = {};
     for (var i=0; i<selection.length; ++i) {
         shown[selection[i].Name] = 1;
     }
+    var count = 0;
     _.each([player_dots.selectAll("rect"), player_paths.selectAll("path")], function(obj) {
         obj.style("display", function(d) {
-            return shown[d.Name] || (d === clicked_player) ? "inline" : "none";
+            var v = shown[d.Name] || (d === clicked_player);
+            count += ~~v;
+            return v ? "inline" : "none";
         });
     });
+    d3.select("#active").text(formatNumber(count/2));
 }
 
 function create_vis(obj, player_csv, election_csv)
@@ -231,6 +240,7 @@ function create_vis(obj, player_csv, election_csv)
     player_paths = box1;
 
     var colors = d3.scale.category10();
+    colors.domain([0,4,1,3,5,2,6,7]);
 
     box2.selectAll("rect")
         .data(players)
@@ -393,21 +403,24 @@ function create_vis(obj, player_csv, election_csv)
 
     var induction_legend = d3.select("#induction_legend").append("svg")
         .attr("width", (width / 10) * 1.5)
-        .attr("height", (margin.top + height + margin.bottom) * 0.23);
+        .attr("height", (margin.top + height + margin.bottom) * 0.26);
 
     var induction_legend_items = induction_legend.selectAll("g")
         .data(["Not yet inducted",
                "BBWAA > 75%",
                "BBWAA Special Election",
                "BBWAA Runoff Election",
-               "Veterans Committee",
-               "Negro Leagues Committee"])
+               "Veterans Committee (Player)",
+               "Negro Leagues Committee",
+               "Veterans Committee (Manager)",
+               "Veterans Committee (Executive)"
+              ])
         .enter()
         .append("g");
 
     var induction_legend_y = d3.scale.linear()
         .domain([0, 6])
-        .range([5, 5 + 6 * 20]);
+        .range([5, 5 + 6 * 17]);
 
     var induction_legend_rects, induction_legend_texts;
 
@@ -473,7 +486,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var position_legend_y = d3.scale.linear()
         .domain([0, positions.length])
-        .range([5, 5 + positions.length * 20]);
+        .range([5, 5 + positions.length * 17]);
 
     var position_legend_rects, position_legend_texts;
 
@@ -691,6 +704,8 @@ function barChart() {
                 g.selectAll(".foreground.bar")
                     .attr("clip-path", "url(#clip-" + id + ")");
 
+                axis.ticks(5);
+
                 g.append("g")
                     .attr("class", "axis")
                     // .attr("transform", "translate(0," + height + ")")
@@ -866,18 +881,28 @@ $(function() {
             create_vis(obj, player_csv, election_csv);
 
             window.addEventListener("popstate", function(e) {
-                query_state = e.state || {};
+                debugger;
+                query_state = e.state || $.deparam(location.hash.substr(7)).query || {};
                 replace_queries();
                 update_brushes();
                 renderAll();
             });
 
-            if (location.hash.length > 7) {
-                query_state = $.deparam(location.hash.substr(7)).query;
-                replace_queries();
-                update_brushes();
-                renderAll();
+            function update_from_hash(hash) {
+                if (hash.length > 7) {
+                    query_state = $.deparam(hash.substr(7)).query;
+                    replace_queries();
+                    update_brushes();
+                    renderAll();
+                }
             }
+
+            update_from_hash(location.hash);
+
+            // window.addEventListener("onhashchange", function(e) {
+            //     debugger;
+            //     update_from_hash(location.hash);
+            // });
         });
     });
 });

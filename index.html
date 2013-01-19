@@ -118,27 +118,26 @@ th {
     <div style="float: left; padding-left: 2em">
       <table id="player-stats">
 	<tr>
-	  <th>Name</th><th>Pos</th><th>Yrs</th><th>G</th><th>WAR</th><th>Batting:</th><th>AB</th><th>R</th><th>H</th><th>HR</th><th>RBI</th><th>SB</th><th>BB</th><th>BA</th><th>OBP</th><th>SLG</th><th>OPS</th><th>OPS.Plus</th>
+	  <th>Name</th><th>Pos</th><th>Yrs</th><th>G</th><th>WAR</th><th>Batting:</th><th>AB</th><th>R</th><th>H</th><th>HR</th><th>RBI</th><th>SB</th><th>BB</th><th>BA</th><th>OBP</th><th>SLG</th><th>OPS</th>
 	</tr>
 	<tr>
 	  <td id="player-Name" class="tablename">-</td>
-	  <td id="player-Pos">-</td>
-	  <td id="player-Yrs">-</td>
-	  <td id="player-G">-</td>
-	  <td id="player-WAR">-</td>
+	  <td id="player-Pos" class="player-stats">-</td>
+	  <td id="player-Yrs" class="player-stats">-</td>
+	  <td id="player-G" class="player-stats" style="width:2.8em">-</td>
+	  <td id="player-WAR" class="player-stats" style="width:2.8em">-</td>
 	  <td></td>
-	  <td id="player-AB">-</td>
-	  <td id="player-R">-</td>
-	  <td id="player-H">-</td>
-	  <td id="player-HR">-</td>
-	  <td id="player-RBI">-</td>
-	  <td id="player-SB">-</td>
-	  <td id="player-BB">-</td>
-	  <td id="player-BA">-</td>
-	  <td id="player-OBP">-</td>
-	  <td id="player-SLG">-</td>
-	  <td id="player-OPS">-</td>
-	  <td id="player-OPS.Plus">-</td>
+	  <td id="player-AB" class="player-stats" style="width:3.2em">-</td>
+	  <td id="player-R" class="player-stats" style="width:2.8em">-</td>
+	  <td id="player-H" class="player-stats" style="width:2.8em">-</td>
+	  <td id="player-HR" class="player-stats" style="width:2em">-</td>
+	  <td id="player-RBI" class="player-stats" style="width:2.8em">-</td>
+	  <td id="player-SB" class="player-stats" style="width:2.8em">-</td>
+	  <td id="player-BB" class="player-stats" style="width:2.8em">-</td>
+	  <td id="player-BA" class="player-stats" style="width:2.8em">-</td>
+	  <td id="player-OBP" class="player-stats" style="width:2.8em">-</td>
+	  <td id="player-SLG" class="player-stats" style="width:2.8em">-</td>
+	  <td id="player-OPS" class="player-stats">-</td>
 	</tr>
 	<tr>
 	  <th></th><th></th><th></th><th></th><th></th><th>Pitching:</th><th>W</th><th>L</th><th>ERA</th><th>WHIP</th><th>GS</th><th>SV</th><th>IP</th><th>H.1</th><th>HR.1</th><th>BB.1</th><th>SO</th>
@@ -156,7 +155,7 @@ th {
 	  <td id="player-WHIP">-</td>
 	  <td id="player-GS">-</td>
 	  <td id="player-SV">-</td>
-	  <td id="player-IP">-</td>
+	  <td id="player-IP" style="width:3.8em">-</td>
 	  <td id="player-H.1">-</td>
 	  <td id="player-HR.1">-</td>
 	  <td id="player-BB.1">-</td>
@@ -165,12 +164,20 @@ th {
       </table>
     </div>
     <div style="clear: both"/>
-    <aside id="totals"><span id="active">-</span> of <span id="total">-</span> players selected.</aside>
+    <aside id="totals"><span id="active">-</span> of <span id="total">-</span> players selected. <a href="#state=">Clear query</a>.</aside>
     <table><td><span id="main"></span></td><td>
     <table><tr><td>Inducted by:</td></tr><tr><td><span id="induction_legend"></span></td></tr><tr><td>Position:</td></tr><tr><td><span id="position_legend"></span></td></tr></table>
     </td></table>
   </div>
   <div id="charts">
   </div>
+  <hr>
+  <p>This is a test of some text. Let's select all <a href="#state=query%5Binduction_method%5D=2">real inductees</a> Now the <a href="#state=query%5Bposition%5D=2048">suit</a>!
+    <h2>Acknowledgments</h2>
+  <p>The raw data for this visualization comes from <a href="http://www.baseball-reference.com/">baseball-reference.com</a>.</p>
+    <hr>
+    <p><a href="about.html">About</a> this visualization.</p>
+  <p></p>
+
 </body>
 </html>
