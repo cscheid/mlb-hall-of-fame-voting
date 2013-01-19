@@ -632,6 +632,9 @@ function barChart() {
             d;
             while (++i < n) {
                 d = groups[i];
+                if (x(d.key) === Infinity ||
+                    y(d.value) === Infinity)
+                    continue;
                 path.push("M0,", x(d.key), "H", y(d.value), "v9H0");
             }
             return path.join("");
