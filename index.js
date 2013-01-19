@@ -18,7 +18,6 @@ var dimension_filter_map = {};
 
 function save_query_state()
 {
-    debugger;
     history.pushState(query_state, "Query", 
                       location.origin + location.pathname + "?state=" + $.param({ query: query_state }));
 }
@@ -32,7 +31,7 @@ function query_state_updater(brush, query_key_accessor, brush_state_accessor) {
             query_state[query_key] = brush_state_accessor();
         }
         history.replaceState(query_state, "Query",
-                             location.origin + location.pathname + "?state=" +
+                             location.origin + location.pathname + "#state=" +
                              $.param({ query : query_state }));
     };
 }
@@ -50,7 +49,12 @@ function replace_queries()
 function update_brushes()
 {
     _.each(charts, function(chart) {
+        var v = query_state[chart.query_key()];
         chart.brush().clear();
+        if (!_.isUndefined(v)) {
+            chart.brush().extent(v);
+        }
+        chart.refresh_brush();
     });
 }
 
@@ -584,6 +588,7 @@ function barChart() {
         id = barChart.id++,
         axis = d3.svg.axis().orient("left"),
         brush = d3.svg.brush(),
+        gBrush,
         brushDirty,
         dimension,
         group,
@@ -645,7 +650,7 @@ function barChart() {
                     .call(axis);
 
                 // Initialize the brush component with pretty resize handles.
-                var gBrush = g.append("g").attr("class", "brush").call(brush);
+                gBrush = g.append("g").attr("class", "brush").call(brush);
                 gBrush.selectAll("rect").attr("width", width);
                 gBrush.selectAll(".resize").append("path").attr("d", resizePath);
             }
@@ -737,6 +742,11 @@ function barChart() {
         }
     });
 
+    chart.refresh_brush = function() {
+        brushDirty = true;
+        gBrush.call(brush);
+    };
+
     chart.brush = function() {
         return brush;
     };
@@ -755,7 +765,7 @@ function barChart() {
 
     chart.x = function(_) {
         if (!arguments.length) return x;
-         x = _;
+        x = _;
         axis.scale(x);
         brush.y(x);
         return chart;
@@ -809,11 +819,18 @@ $(function() {
             create_vis(obj, player_csv, election_csv);
 
             window.addEventListener("popstate", function(e) {
-                query_state = e.state;
+                query_state = e.state || {};
                 replace_queries();
                 update_brushes();
                 renderAll();
             });
+
+            if (location.hash.length > 7) {
+                query_state = $.deparam(location.hash.substr(7)).query;
+                replace_queries();
+                update_brushes();
+                renderAll();
+            }
         });
     });
 });
