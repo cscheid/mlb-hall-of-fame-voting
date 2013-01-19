@@ -231,7 +231,7 @@ function create_vis(obj, player_csv, election_csv)
     player_paths = box1;
 
     var colors = d3.scale.category10();
-    colors.domain([1,0,4,3,5,2,6,7]);
+    colors.domain([0,4,1,3,5,2,6,7]);
 
     box2.selectAll("rect")
         .data(players)
