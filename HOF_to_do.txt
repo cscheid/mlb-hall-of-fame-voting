@@ -16,5 +16,8 @@
 
 - colors: switch orange and blue? And maybe add a toggle to choose whether to color points by method of induction vs. position.
 
+- fix tick count for histograms
+
+- brush on trajectory graph?
 
 

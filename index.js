@@ -15,24 +15,14 @@ var dots = {};
 
 function highlight_on(player)
 {
-    dots[player.Name]
-        .attr("stroke", "black")
-        .attr("stroke-width", 2);
-
-    lines[player.Name]
-        .attr("stroke-opacity", 1)
-        .attr("stroke-width", 3);
+    dots[player.Name].attr("stroke", "black").attr("stroke-width", 2);
+    lines[player.Name].attr("stroke-opacity", 1).attr("stroke-width", 3);
 }
 
 function highlight_off(player)
 {
-    dots[player.Name]
-        .attr("stroke", "none")
-        .attr("stroke-width", 0);
-
-    lines[player.Name]
-        .attr("stroke-opacity", 0.15)
-        .attr("stroke-width", 2);
+    dots[player.Name].attr("stroke", "none").attr("stroke-width", 0);
+    lines[player.Name].attr("stroke-opacity", 0.15).attr("stroke-width", 2);
 }
 
 function toggle_player(player)
@@ -62,33 +52,26 @@ function toggle_player(player)
     renderAll();
 }
 
-function render(method) {
-    d3.select(this).call(method);
-}
-
 function renderAll() {
-    chart.each(render);
+    chart.each(function(method) { d3.select(this).call(method); });
     d3.select("#active").text(formatNumber(all.value()));
     var selection = dimensions[0].top(Infinity);
     var shown = {};
     for (var i=0; i<selection.length; ++i) {
         shown[selection[i].Name] = 1;
     }
-    player_dots.selectAll("rect")
+    _.each([player_dots, player_paths], function(obj) {
+        obj.selectAll("rect")
         .style("display", function(d) {
             return shown[d.Name] || (d === clicked_player) ? "inline" : "none";
         });
-    player_paths.selectAll("path")
-        .style("display", function(d) {
-            return shown[d.Name] || (d === clicked_player)  ? "inline" : "none";
-        });
+    });
 }
 
 function create_vis(obj, player_csv, election_csv)
 {
     var players = obj.list;
     var player_map = obj.map;
-
     var i;
 
     // enrich player_csv with computed data from players
@@ -103,15 +86,9 @@ function create_vis(obj, player_csv, election_csv)
         .text(formatNumber(cf.size()));
     all = cf.groupAll();
 
-    name_dimension = cf.dimension(function(d) {
-        return d.Name.toLowerCase();
-    });
-    induction_method_dimension = cf.dimension(function(d) {
-        return Number(d.method);
-    });
-    player_position_dimension = cf.dimension(function(d) {
-        return d.position;
-    });
+    name_dimension = cf.dimension(function(d) { return d.Name.toLowerCase(); });
+    induction_method_dimension = cf.dimension(function(d) { return Number(d.method); });
+    player_position_dimension = cf.dimension(function(d) { return d.position; });
 
     var svg = d3.select("#main").append("svg")
         .attr("width", width + margin.left + margin.right)
