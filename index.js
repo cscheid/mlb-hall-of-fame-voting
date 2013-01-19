@@ -17,6 +17,8 @@ var query_state = {};
 var dimension_filter_map = {};
 var trajectory_brush;
 var refresh_trajectory_brush;
+var redraw_induction_legend_query;
+var redraw_position_legend_query;
 
 function state_url()
 {
@@ -45,6 +47,9 @@ function replace_queries()
     _.each(dimensions, function(dim) {
         dim.filterAll();
     });
+    dimension_filter_map.induction_method(0);
+    dimension_filter_map.position(0);
+
     _.each(query_state, function(v, k) {
         dimension_filter_map[k](v);
     });
@@ -60,6 +65,8 @@ function update_brushes()
         }
         chart.refresh_brush();
     });
+
+    // trajectory brush
     if (query_state.last_appearance) {
         trajectory_brush.extent([[query_state.last_appearance[0], query_state.last_vote[0]],
                                  [query_state.last_appearance[1], query_state.last_vote[1]]]);
@@ -67,6 +74,10 @@ function update_brushes()
         trajectory_brush.clear();
     }
     refresh_trajectory_brush();
+
+    // induction method brushes
+    redraw_induction_legend_query();
+    redraw_position_legend_query();
 }
 
 function highlight_on(player)
@@ -347,12 +358,6 @@ function create_vis(obj, player_csv, election_csv)
         return name_box_value === "" || (d._lowercase_name.indexOf(name_box_value) !== -1);
     }
 
-    var method_query_value = 0;
-    function method_query(d) {
-        var method = d.method;
-        return method_query_value === 0 || ((1 << Number(method)) & method_query_value);
-    }
-
     var positions = [
         "P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "OF", "DH", "Manager", "Batters"
     ];
@@ -373,7 +378,15 @@ function create_vis(obj, player_csv, election_csv)
         position_mask["OF"] | 
         position_mask["DH"];
 
+    var method_query_value = 0;
     var position_query_value = 0;
+
+    dimension_filter_map.induction_method = function(v) {
+        method_query_value = v;
+    };
+    dimension_filter_map.position = function(v) {
+        position_query_value = v;
+    };
 
     //////////////////////////////////////////////////////////////////////////
     // induction legend
@@ -397,8 +410,8 @@ function create_vis(obj, player_csv, election_csv)
         .range([5, 5 + 6 * 20]);
 
     var induction_legend_rects, induction_legend_texts;
-    function update_induction_legend_query(d, i) {
-        method_query_value = method_query_value ^ (1 << i);
+
+    redraw_induction_legend_query = function() {
         induction_method_dimension.filter(function(d) {
             return method_query_value === 0 || ((1 << d) & method_query_value);
         });
@@ -413,6 +426,16 @@ function create_vis(obj, player_csv, election_csv)
                 return (method_query_value === 0 || ((1 << i) & method_query_value)) ?
                     1.0 : 0.2;
             });
+    };
+
+    function update_induction_legend_query(d, i) {
+        method_query_value = method_query_value ^ (1 << i);
+        redraw_induction_legend_query();
+        if (method_query_value)
+            query_state.induction_method = method_query_value;
+        else
+            delete query_state.induction_method;
+        save_query_state();
     }
     induction_legend_items.append("rect")
         .attr("width", 10)
@@ -453,8 +476,8 @@ function create_vis(obj, player_csv, election_csv)
         .range([5, 5 + positions.length * 20]);
 
     var position_legend_rects, position_legend_texts;
-    function update_position_legend_query(d, i) {
-        position_query_value = position_query_value ^ position_mask[d];
+
+    redraw_position_legend_query = function() {
         player_position_dimension.filter(function(d) {
             return position_query_value === 0 || (position_mask[d] & position_query_value);
         });
@@ -469,6 +492,16 @@ function create_vis(obj, player_csv, election_csv)
                 return (position_query_value === 0 || (position_mask[d] & position_query_value)) ?
                     1.0 : 0.2;
             });
+    };
+
+    function update_position_legend_query(d, i) {
+        position_query_value = position_query_value ^ position_mask[d];
+        redraw_position_legend_query();
+        if (position_query_value)
+            query_state.position = position_query_value;
+        else
+            delete query_state.position;
+        save_query_state();
     }
     position_legend_items.append("rect")
         .attr("width", 10)
