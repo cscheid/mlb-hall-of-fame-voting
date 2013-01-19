@@ -866,18 +866,28 @@ $(function() {
             create_vis(obj, player_csv, election_csv);
 
             window.addEventListener("popstate", function(e) {
-                query_state = e.state || {};
+                debugger;
+                query_state = e.state || $.deparam(location.hash.substr(7)).query || {};
                 replace_queries();
                 update_brushes();
                 renderAll();
             });
 
-            if (location.hash.length > 7) {
-                query_state = $.deparam(location.hash.substr(7)).query;
-                replace_queries();
-                update_brushes();
-                renderAll();
+            function update_from_hash(hash) {
+                if (hash.length > 7) {
+                    query_state = $.deparam(hash.substr(7)).query;
+                    replace_queries();
+                    update_brushes();
+                    renderAll();
+                }
             }
+
+            update_from_hash(location.hash);
+
+            // window.addEventListener("onhashchange", function(e) {
+            //     debugger;
+            //     update_from_hash(location.hash);
+            // });
         });
     });
 });
