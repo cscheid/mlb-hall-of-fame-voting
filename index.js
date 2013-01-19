@@ -19,10 +19,14 @@ var trajectory_brush;
 var refresh_trajectory_brush;
 var redraw_induction_legend_query;
 var redraw_position_legend_query;
+var _debugging = false;
+
+//////////////////////////////////////////////////////////////////////////////
 
 function state_url()
 {
-    return location.origin + location.pathname + "#state=" + $.param({ query: query_state });
+    return location.origin + location.pathname + 
+        "#state=" + $.param({ query: query_state });
 }
 
 function save_query_state()
@@ -120,17 +124,22 @@ function toggle_player(player)
 
 function renderAll() {
     chart.each(function(method) { d3.select(this).call(method); });
-    d3.select("#active").text(formatNumber(all.value()));
+    if (_debugging)
+        debugger;
     var selection = dimensions[0].top(Infinity);
     var shown = {};
     for (var i=0; i<selection.length; ++i) {
         shown[selection[i].Name] = 1;
     }
+    var count = 0;
     _.each([player_dots.selectAll("rect"), player_paths.selectAll("path")], function(obj) {
         obj.style("display", function(d) {
-            return shown[d.Name] || (d === clicked_player) ? "inline" : "none";
+            var v = shown[d.Name] || (d === clicked_player);
+            count += ~~v;
+            return v ? "inline" : "none";
         });
     });
+    d3.select("#active").text(formatNumber(count/2));
 }
 
 function create_vis(obj, player_csv, election_csv)
