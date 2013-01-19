@@ -15,11 +15,17 @@ var lines = {};
 var dots = {};
 var query_state = {};
 var dimension_filter_map = {};
+var trajectory_brush;
+var refresh_trajectory_brush;
+
+function state_url()
+{
+    return location.origin + location.pathname + "#state=" + $.param({ query: query_state });
+}
 
 function save_query_state()
 {
-    history.pushState(query_state, "Query", 
-                      location.origin + location.pathname + "?state=" + $.param({ query: query_state }));
+    history.pushState(query_state, "Query", state_url());
 }
 
 function query_state_updater(brush, query_key_accessor, brush_state_accessor) {
@@ -30,9 +36,7 @@ function query_state_updater(brush, query_key_accessor, brush_state_accessor) {
         } else {
             query_state[query_key] = brush_state_accessor();
         }
-        history.replaceState(query_state, "Query",
-                             location.origin + location.pathname + "#state=" +
-                             $.param({ query : query_state }));
+        history.replaceState(query_state, "Query", state_url());
     };
 }
 
@@ -56,6 +60,13 @@ function update_brushes()
         }
         chart.refresh_brush();
     });
+    if (query_state.last_appearance) {
+        trajectory_brush.extent([[query_state.last_appearance[0], query_state.last_vote[0]],
+                                 [query_state.last_appearance[1], query_state.last_vote[1]]]);
+    } else {
+        trajectory_brush.clear();
+    }
+    refresh_trajectory_brush();
 }
 
 function highlight_on(player)
@@ -278,7 +289,11 @@ function create_vis(obj, player_csv, election_csv)
     var brush = d3.svg.brush();
     brush.x(x);
     brush.y(y);
+    trajectory_brush = brush;
     var gBrush = box0.append("g").attr("class", "brush").call(brush);
+    refresh_trajectory_brush = function() {
+        gBrush.call(brush);
+    };
 
     brush.on("brush", function() {
         if (brush.empty()) {
@@ -289,13 +304,12 @@ function create_vis(obj, player_csv, election_csv)
         } else {
             var extent = brush.extent();
             last_appearance_dimension.filterRange([extent[0][0], extent[1][0]]);
-            last_vote_dimension.filterRange([extent[0][1], extent[1][1]]);        
+            last_vote_dimension.filterRange([extent[0][1], extent[1][1]]);
             query_state.last_appearance = [extent[0][0], extent[1][0]];
             query_state.last_vote = [extent[0][1], extent[1][1]];
         }
         renderAll();
-        history.replaceState(query_state, "Query", 
-                             location.origin + location.pathname + "?state=" + $.param({ query: query_state }));
+        history.replaceState(query_state, "Query", state_url());
     });
 
     brush.on("brushstart", function() {
