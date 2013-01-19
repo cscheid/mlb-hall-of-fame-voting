@@ -40,8 +40,15 @@ body {
     font-size: 11px;
 }
 
+hr {
+  margin-left: 50px;
+  margin-right: 50px;
+}
+
 h2 {
   margin: 0px;
+  margin-left: 50px;
+  margin-right: 50px;
   padding: 0px;
 }
 
@@ -51,7 +58,7 @@ h2 {
 
 .chart {
   display: inline-block;
-  height: 151px;
+  height: 101px;
   margin-bottom: 20px;
 }
 
@@ -62,12 +69,18 @@ h2 {
   color: #ccc;
 }
 
+.hide {
+  padding-left: 1em;
+  font-size: smaller;
+  color: #ccc;
+}
+
 .background.bar {
   fill: #ccc;
 }
 
 .foreground.bar {
-  fill: steelblue;
+  fill: #246;
 }
 
 .axis path, .axis line {
@@ -98,6 +111,10 @@ th {
     width: 10em;
 }
 
+p {
+    margin-left: 75px;
+}
+
 </style>
 <title>MLB Hall of Fame voting</title>
 </head>
@@ -112,10 +129,10 @@ th {
   <script src="index.js"></script>
   <h2>MLB Hall of Fame voting</h2><hr>
   <div>
-    <div style="float: left">
+    <div style="float: left; margin-left: 50px">
       Player Name: <input type="text" id="searchbox"></div>
     </div>
-    <div style="float: left; padding-left: 2em">
+    <div style="float: right; margin-right: 50px">
       <table id="player-stats">
 	<tr>
 	  <th>Name</th><th>Pos</th><th>Yrs</th><th>G</th><th>WAR</th><th>Batting:</th><th>AB</th><th>R</th><th>H</th><th>HR</th><th>RBI</th><th>SB</th><th>BB</th><th>BA</th><th>OBP</th><th>SLG</th><th>OPS</th>
@@ -163,13 +180,14 @@ th {
 	</tr>
       </table>
     </div>
-    <div style="clear: both"/>
-    <aside id="totals"><span id="active">-</span> of <span id="total">-</span> players selected. <a href="#state=">Clear query</a>.</aside>
+    <aside id="totals" style="margin: 50px"><span id="active">-</span> of <span id="total">-</span> players selected. <a href="#state=">Clear query</a>.</aside>
     <table><td><span id="main"></span></td><td>
     <table><tr><td>Inducted by:</td></tr><tr><td><span id="induction_legend"></span></td></tr><tr><td>Position:</td></tr><tr><td><span id="position_legend"></span></td></tr></table>
     </td></table>
   </div>
-  <div id="charts">
+  <div id="charts" style="margin-left: 50px; margin-right:50px">
+  </div>
+  <div id="show" style="margin-left: 50px; margin-right:50px"> Show:
   </div>
   <hr>
   <p>This is a test of some text. Let's select all <a href="#state=query%5Binduction_method%5D=2">real inductees</a> Now the <a href="#state=query%5Bposition%5D=2048">suit</a>!

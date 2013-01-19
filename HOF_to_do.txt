@@ -12,6 +12,8 @@ THINGS TO DO
 
 - histograms for position and induction method
 
+- rename badly named columns
+
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 THINGS TO NOTE
 

@@ -1,5 +1,5 @@
 var width = window.innerWidth * 0.75, height = window.innerHeight * 0.5;
-var margin = { top: 20, right: 20, bottom: 40, left: 50 };
+var margin = { top: 20, right: 20, bottom: 40, left: 60 };
 var first_year = 1936, last_year = 2013;
 var cf, all, chart;
 var formatNumber = d3.format(",d");
@@ -13,7 +13,7 @@ var dimensions = [];
 var groups = [];
 var lines = {};
 var dots = {};
-var query_state = {};
+var vis_state = { shown_histograms: {} };
 var dimension_filter_map = {};
 var trajectory_brush;
 var refresh_trajectory_brush;
@@ -26,23 +26,23 @@ var _debugging = false;
 function state_url()
 {
     return location.origin + location.pathname + 
-        "#state=" + $.param({ query: query_state });
+        "#state=" + $.param({ state: vis_state });
 }
 
-function save_query_state()
+function save_vis_state()
 {
-    history.pushState(query_state, "Query", state_url());
+    history.pushState(vis_state, "Query", state_url());
 }
 
-function query_state_updater(brush, query_key_accessor, brush_state_accessor) {
+function vis_state_updater(brush, query_key_accessor, brush_state_accessor) {
     return function() {
         var query_key = query_key_accessor();
         if (brush.empty()) {
-            delete query_state[query_key];
+            delete vis_state[query_key];
         } else {
-            query_state[query_key] = brush_state_accessor();
+            vis_state[query_key] = brush_state_accessor();
         }
-        history.replaceState(query_state, "Query", state_url());
+        history.replaceState(vis_state, "Query", state_url());
     };
 }
 
@@ -54,15 +54,16 @@ function replace_queries()
     dimension_filter_map.induction_method(0);
     dimension_filter_map.position(0);
 
-    _.each(query_state, function(v, k) {
-        dimension_filter_map[k](v);
+    _.each(vis_state, function(v, k) {
+        if (k in dimension_filter_map)
+            dimension_filter_map[k](v);
     });
 }
 
 function update_brushes()
 {
     _.each(charts, function(chart) {
-        var v = query_state[chart.query_key()];
+        var v = vis_state[chart.query_key()];
         chart.brush().clear();
         if (!_.isUndefined(v)) {
             chart.brush().extent(v);
@@ -71,9 +72,9 @@ function update_brushes()
     });
 
     // trajectory brush
-    if (query_state.last_appearance) {
-        trajectory_brush.extent([[query_state.last_appearance[0], query_state.last_vote[0]],
-                                 [query_state.last_appearance[1], query_state.last_vote[1]]]);
+    if (vis_state.last_appearance) {
+        trajectory_brush.extent([[vis_state.last_appearance[0], vis_state.last_vote[0]],
+                                 [vis_state.last_appearance[1], vis_state.last_vote[1]]]);
     } else {
         trajectory_brush.clear();
     }
@@ -320,29 +321,29 @@ function create_vis(obj, player_csv, election_csv)
         if (brush.empty()) {
             last_appearance_dimension.filterAll();
             last_vote_dimension.filterAll();
-            delete query_state.last_appearance;
-            delete query_state.last_vote;
+            delete vis_state.last_appearance;
+            delete vis_state.last_vote;
         } else {
             var extent = brush.extent();
             last_appearance_dimension.filterRange([extent[0][0], extent[1][0]]);
             last_vote_dimension.filterRange([extent[0][1], extent[1][1]]);
-            query_state.last_appearance = [extent[0][0], extent[1][0]];
-            query_state.last_vote = [extent[0][1], extent[1][1]];
+            vis_state.last_appearance = [extent[0][0], extent[1][0]];
+            vis_state.last_vote = [extent[0][1], extent[1][1]];
         }
         renderAll();
-        history.replaceState(query_state, "Query", state_url());
+        history.replaceState(vis_state, "Query", state_url());
     });
 
     brush.on("brushstart", function() {
         if (brush.empty()) {
-            delete query_state.last_appearance;
-            delete query_state.last_vote;
+            delete vis_state.last_appearance;
+            delete vis_state.last_vote;
         } else {
             var extent = brush.extent();
-            query_state.last_appearance = [extent[0][0], extent[1][0]];
-            query_state.last_vote = [extent[0][1], extent[1][1]];
+            vis_state.last_appearance = [extent[0][0], extent[1][0]];
+            vis_state.last_vote = [extent[0][1], extent[1][1]];
         }
-        save_query_state();
+        save_vis_state();
     });
 
     //////////////////////////////////////////////////////////////////////////
@@ -410,10 +411,10 @@ function create_vis(obj, player_csv, election_csv)
                "BBWAA > 75%",
                "BBWAA Special Election",
                "BBWAA Runoff Election",
-               "Veterans Committee (Player)",
+               "VC (Player)",
                "Negro Leagues Committee",
-               "Veterans Committee (Manager)",
-               "Veterans Committee (Executive)"
+               "VC (Manager)",
+               "VC (Executive)"
               ])
         .enter()
         .append("g");
@@ -445,10 +446,10 @@ function create_vis(obj, player_csv, election_csv)
         method_query_value = method_query_value ^ (1 << i);
         redraw_induction_legend_query();
         if (method_query_value)
-            query_state.induction_method = method_query_value;
+            vis_state.induction_method = method_query_value;
         else
-            delete query_state.induction_method;
-        save_query_state();
+            delete vis_state.induction_method;
+        save_vis_state();
     }
     induction_legend_items.append("rect")
         .attr("width", 10)
@@ -511,10 +512,10 @@ function create_vis(obj, player_csv, election_csv)
         position_query_value = position_query_value ^ position_mask[d];
         redraw_position_legend_query();
         if (position_query_value)
-            query_state.position = position_query_value;
+            vis_state.position = position_query_value;
         else
-            delete query_state.position;
-        save_query_state();
+            delete vis_state.position;
+        save_vis_state();
     }
     position_legend_items.append("rect")
         .attr("width", 10)
@@ -554,6 +555,16 @@ function create_vis(obj, player_csv, election_csv)
     window.reset = function(i) {
         charts[i].filter(null);
         renderAll();
+    };
+
+    window.hide = function(i) {
+        d3.select(document.getElementById(charts[i].query_key() + "-chart")).style("display", "none");
+        d3.select(document.getElementById(charts[i].query_key() + "-show")).style("display", null);
+    };
+
+    window.show = function(i) {
+        d3.select(document.getElementById(charts[i].query_key() + "-chart")).style("display", null);
+        d3.select(document.getElementById(charts[i].query_key() + "-show")).style("display", "none");
     };
 
     var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", 
@@ -614,7 +625,7 @@ function create_vis(obj, player_csv, election_csv)
             .group(group)
             .x(d3.scale.linear()
                .domain([min, min + (range * 1.1)])
-               .range([0, 10 * 11]));
+               .range([0, 8 * 11]));
         c._stat = stat;
         charts.push(c);
     });
@@ -653,11 +664,12 @@ function barChart() {
         dimension,
         group,
         round,
-        query_key;
+        query_key,
+        show_span;
 
     function chart(div) {
-        var width = x.range()[1],
-            height = y.range()[1];
+        var width = y.range()[1],
+            height = x.range()[1];
 
         var g = group.top(2);
         var v;
@@ -677,11 +689,26 @@ function barChart() {
 
             // Create the skeletal chart.
             if (g.empty()) {
+                div.select(".title")
+                    .append("a")
+                    .attr("href", "javascript:hide(" + id + ")")
+                    .attr("class", "hide")
+                    .text("hide");
+                
                 div.select(".title").append("a")
                     .attr("href", "javascript:reset(" + id + ")")
                     .attr("class", "reset")
                     .text("reset")
                     .style("display", "none");
+
+                show_span = d3.select("#show")
+                    .append("span")
+                    .attr("id", query_key + "-show")
+                    .style("display", "none")
+                    .style("padding", "1em")
+                    .append("a")
+                    .attr("href", "javascript:show(" + id + ")")
+                    .text(query_key);
 
                 g = div.append("svg")
                     .attr("width", width + margin.left + margin.right)
@@ -721,7 +748,7 @@ function barChart() {
             if (brushDirty) {
                 brushDirty = false;
                 g.selectAll(".brush").call(brush);
-                div.select(".title a").style("display", brush.empty() ? "none" : null);
+                div.select(".reset").style("display", brush.empty() ? "none" : null);
                 if (brush.empty()) {
                     g.selectAll("#clip-" + id + " rect")
                         .attr("y", 0)
@@ -747,7 +774,7 @@ function barChart() {
                 if (x(d.key) === Infinity ||
                     y(d.value) === Infinity)
                     continue;
-                path.push("M0,", x(d.key), "H", y(d.value), "v9H0");
+                path.push("M0,", x(d.key), "H", y(d.value), "v7H0");
             }
             return path.join("");
         }
@@ -771,18 +798,18 @@ function barChart() {
 
     brush.on("brushstart.chart", function() {
         var div = d3.select(this.parentNode.parentNode.parentNode);
-        div.select(".title a").style("display", null);
-        save_query_state();
+        div.select(".reset").style("display", null);
+        save_vis_state();
     });
 
-    var update_query_state = query_state_updater(
+    var update_vis_state = vis_state_updater(
         brush,
         function() { return query_key; },
         function() { return brush.extent(); }
     );
 
     brush.on("brush.chart", function() {
-        update_query_state();
+        update_vis_state();
         var g = d3.select(this.parentNode),
         extent = brush.extent();
         if (round) g.select(".brush")
@@ -798,7 +825,7 @@ function barChart() {
     brush.on("brushend.chart", function() {
         if (brush.empty()) {
             var div = d3.select(this.parentNode.parentNode.parentNode);
-            div.select(".title a").style("display", "none");
+            div.select(".reset").style("display", "none");
             div.select("#clip-" + id + " rect").attr("y", null).attr("height", "100%");
             dimension.filterAll();
         }
@@ -853,7 +880,7 @@ function barChart() {
             brush.clear();
             dimension.filterAll();
         }
-        update_query_state();
+        update_vis_state();
         brushDirty = true;
         return chart;
     };
@@ -881,8 +908,7 @@ $(function() {
             create_vis(obj, player_csv, election_csv);
 
             window.addEventListener("popstate", function(e) {
-                debugger;
-                query_state = e.state || $.deparam(location.hash.substr(7)).query || {};
+                vis_state = e.state || $.deparam(location.hash.substr(7)).state || {};
                 replace_queries();
                 update_brushes();
                 renderAll();
@@ -890,19 +916,18 @@ $(function() {
 
             function update_from_hash(hash) {
                 if (hash.length > 7) {
-                    query_state = $.deparam(hash.substr(7)).query;
+                    vis_state = $.deparam(hash.substr(7)).state;
                     replace_queries();
                     update_brushes();
                     renderAll();
                 }
             }
 
-            update_from_hash(location.hash);
+            _.each([0, 1, 4, 8, 12, 18, 21, 22, 23, 24, 25, 26], function(i) {
+                window.hide(i);
+            });
 
-            // window.addEventListener("onhashchange", function(e) {
-            //     debugger;
-            //     update_from_hash(location.hash);
-            // });
+            update_from_hash(location.hash);
         });
     });
 });
