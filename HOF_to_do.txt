@@ -45,3 +45,32 @@
 
 
 
+
+________________________________________________________________________________________________________________________
+
+Update: 1/19 11am:
+
+- Get first year of playing career and last year of playing career for each of 1070 players.
+ -- Kenny got this and updated player_data.csv
+
+- Split "Veterans Committee" category into 3 categories:
+ -- Veterans Committee (Player)
+ -- Veterans Committee (Manager)
+ -- Veterans Committee (Executive)
+ -- Kenny has updated the data in player_data.csv
+ -- To do: edit category legend and add two colors to color palette
+
+- Kenny to select histogram range for each statistic.
+
+- Kenny to update players with position listed as "OF"
+ -- Looks like 22 players may never be classified into LF, RF, CF. The other 79 "OF" are now classified into either LF, RF, or CF.
+
+- Statistics formatting (for the stat line at top of plot, and also for histogram axis labels)
+  - Right-justify stats that display above the plot.
+  - Set up stats like ERA and BA to always have the right number of significant digits. Kenny will write this down somewhere.
+
+
+
+
+
+
