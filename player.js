@@ -2,25 +2,39 @@ function create_player(entry)
 {
     return {
         Name: entry.Name,
+        Pos: entry.position,
+        Stats: entry,
         _lowercase_name: entry.Name.toLowerCase(),
-        _selected: true,
         Appearances: []
     };
 }
 
-function create_players(csv) {
+function create_players(csv, csv2) {
+    var i;
     var players = {};
 
-    for (var i=0; i<csv.length; ++i) {
+    for (i=0; i<csv.length; ++i) {
         var entry = csv[i];
         var player = players[entry.Name];
         if (player === undefined) {
             player = create_player(entry);
             players[player.Name] = player;
         }
-        player.Appearances.push(entry);
     }
 
+    for (i=0; i<csv2.length; ++i) {
+        var entry = csv2[i];
+        players[entry.Name].Appearances.push(entry);
+    } 
+
+    function set_value(p, f, v) {
+        var t = Number(v);
+        if (isNaN(t))
+            p[f] = 100; // only happens for Lou Gehrig
+        else
+            p[f] = v;
+    }
+    
     for (var player_name in players) {
         var player = players[player_name];
         player.Appearances.sort(function(a1, a2) {
@@ -28,38 +42,24 @@ function create_players(csv) {
             a2 = Number(a2.Year);
             return a1 - a2;
         });
+        var first_appearance = player.Appearances[0];
         var last_appearance = player.Appearances[player.Appearances.length-1];
-        player.last_appearance = Number(last_appearance.Year);
-        var v = last_appearance["X.vote"];
-        player.last_vote = Number(v.substr(0, v.length-1));
-        player.position = last_appearance.position;
+        set_value(player, "first_appearance", Number(first_appearance.Year));
+        set_value(player, "last_appearance", Number(last_appearance.Year));
+        set_value(player, "first_vote", Number(first_appearance.pct));
+        set_value(player, "last_vote", Number(last_appearance.pct));
+        set_value(player, "min_vote", d3.min(player.Appearances, function(i) { return Number(i.pct); }));
+        set_value(player, "max_vote", d3.max(player.Appearances, function(i) { return Number(i.pct); }));
+        
+        player.position = player.Stats.position;
     }
     var lst = [];
     for (player_name in players) {
         lst.push(players[player_name]);
     };
-    players = lst;
 
-    var player_list_copy = players.slice();
-    player_list_copy.sort(function(p1, p2) {
-        var c = p1.last_appearance - p2.last_appearance;
-        if (c) return c;
-        c = p1.last_vote - p2.last_vote;
-        return c;
-    });
-
-    // setup layout for histogram view
-    var histogram_position;
-    var current_year = 0;
-    for (i=0; i<player_list_copy.length; ++i) {
-        var player = player_list_copy[i];
-        if (current_year !== player.last_appearance) {
-            current_year = player.last_appearance;
-            histogram_position = 0;
-        }
-        player.histogram_position = histogram_position++;
-        largest_histogram_count = Math.max(largest_histogram_count, histogram_position);
-    }
-
-    return players;
+    return { 
+        list: lst,
+        map: players
+    };
 }
