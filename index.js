@@ -1,9 +1,7 @@
 var width = window.innerWidth * 0.75, height = window.innerHeight * 0.5;
 var margin = { top: 20, right: 20, bottom: 40, left: 50 };
 var first_year = 1936, last_year = 2013;
-var largest_histogram_count = 0;
-var players;
-var cf, all, war, wars, jaws, jawss, chart, hr, hrs;
+var cf, all, chart;
 var formatNumber = d3.format(",d");
 var player_dots;
 var player_paths;
@@ -14,7 +12,6 @@ var dimensions = [];
 var groups = [];
 var lines = {};
 var dots = {};
-_debugging = false;
 
 function highlight_on(player)
 {
@@ -48,14 +45,12 @@ function toggle_player(player)
     if (clicked_player === player) {
         clicked_player = undefined;
         _.each(lst, function(c) {
-            debugger;
             document.getElementById("player-"+c).innerHTML = "-";
         });
     } else {
         clicked_player = player;
         highlight_on(clicked_player);
         _.each(lst, function(c) {
-            debugger;
             var v = player.Stats[c];
             if (v === undefined)
                 v = player[c];
@@ -89,9 +84,19 @@ function renderAll() {
         });
 }
 
-function create_vis(players, player_csv, election_csv)
+function create_vis(obj, player_csv, election_csv)
 {
+    var players = obj.list;
+    var player_map = obj.map;
+
     var i;
+
+    // enrich player_csv with computed data from players
+    _.each(player_csv, function(line) {
+        _.each(["first_vote", "last_vote", "first_appearance", "last_appearance"], function(f) {
+            line[f] = player_map[line.Name][f];
+        });
+    });
 
     cf = crossfilter(player_csv);
     d3.selectAll("#total")
@@ -122,10 +127,6 @@ function create_vis(players, player_csv, election_csv)
 
     var trajectory_y = d3.scale.linear()
         .domain([0, 100])
-        .range([margin.top+height, margin.top]);
-
-    var histogram_y = d3.scale.linear()
-        .domain([0, largest_histogram_count])
         .range([margin.top+height, margin.top]);
 
     var x = d3.scale.linear()
@@ -280,9 +281,11 @@ function create_vis(players, player_csv, election_csv)
     var positions = [
         "P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "OF", "DH", "Manager", "Batters"
     ];
+
     var position_mask = {};
     for (i=0; i<positions.length-1; ++i)
         position_mask[positions[i]] = 1 << i;
+
     position_mask["Batters"] = 
         position_mask["C"] | 
         position_mask["1B"] | 
@@ -421,33 +424,6 @@ function create_vis(players, player_csv, election_csv)
         });
         renderAll();
     });
-
-    $("#show-trajectory").click(function() {
-        box2.selectAll("rect")
-            .transition()
-            .duration(1000)
-            .attr("y", function(d) { return trajectory_y(d.last_vote)-5; })
-            .attr("stroke", "none")
-            .attr("width", 10)
-            .attr("height", 10)
-            .attr("rx", 5)
-            .attr("ry", 5)
-        ;
-    });
-
-    $("#show-histogram").click(function() {
-        box2.selectAll("rect")
-            .transition()
-            .duration(1000)
-            .attr("y", function(d) { return histogram_y(d.histogram_position)-5; })
-            .attr("width", x(1) - x(0) - 1)
-            .attr("height", histogram_y(0) - histogram_y(1) - 1)
-            .attr("stroke", "black")
-            .attr("rx", 0)
-            .attr("ry", 0)
-        ;
-    });
-
 
     window.filter = function(filters) {
         filters.forEach(function(d, i) { charts[i].filter(d); });
@@ -746,7 +722,7 @@ function barChart() {
 
 d3.csv("player_data.csv", function(error, player_csv) {
     d3.csv("election_data.csv", function(error, election_csv) {
-        players = create_players(player_csv, election_csv);
-        create_vis(players, player_csv, election_csv);
+        var obj = create_players(player_csv, election_csv);
+        create_vis(obj, player_csv, election_csv);
     });
 });
