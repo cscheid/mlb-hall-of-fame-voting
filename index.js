@@ -6,13 +6,53 @@ var formatNumber = d3.format(",d");
 var player_dots;
 var player_paths;
 var induction_method_dimension, player_position_dimension, name_dimension;
-var last_year_dimension, last_vote_dimension;
+var last_appearance_dimension, last_vote_dimension;
 var clicked_player;
 var charts = [];
 var dimensions = [];
 var groups = [];
 var lines = {};
 var dots = {};
+var query_state = {};
+var dimension_filter_map = {};
+
+function save_query_state()
+{
+    debugger;
+    history.pushState(query_state, "Query", 
+                      location.origin + location.pathname + "?state=" + $.param({ query: query_state }));
+}
+
+function query_state_updater(brush, query_key_accessor, brush_state_accessor) {
+    return function() {
+        var query_key = query_key_accessor();
+        if (brush.empty()) {
+            delete query_state[query_key];
+        } else {
+            query_state[query_key] = brush_state_accessor();
+        }
+        history.replaceState(query_state, "Query",
+                             location.origin + location.pathname + "?state=" +
+                             $.param({ query : query_state }));
+    };
+}
+
+function replace_queries()
+{
+    _.each(dimensions, function(dim) {
+        dim.filterAll();
+    });
+    _.each(query_state, function(v, k) {
+        dimension_filter_map[k](v);
+    });
+}
+
+function update_brushes()
+{
+    _.each(charts, function(chart) {
+        chart.brush().clear();
+    });
+}
 
 function highlight_on(player)
 {
@@ -30,7 +70,6 @@ function toggle_player(player)
 {
     var lst = ["Name", "Pos", "Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO",
                "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus"];
-
     if (clicked_player !== undefined)
         highlight_off(clicked_player);
     if (clicked_player === player) {
@@ -239,14 +278,32 @@ function create_vis(obj, player_csv, election_csv)
 
     brush.on("brush", function() {
         if (brush.empty()) {
-            last_year_dimension.filterAll();
+            last_appearance_dimension.filterAll();
             last_vote_dimension.filterAll();
+            delete query_state.last_appearance;
+            delete query_state.last_vote;
         } else {
             var extent = brush.extent();
-            last_year_dimension.filterRange([extent[0][0], extent[1][0]]);
+            last_appearance_dimension.filterRange([extent[0][0], extent[1][0]]);
             last_vote_dimension.filterRange([extent[0][1], extent[1][1]]);        
+            query_state.last_appearance = [extent[0][0], extent[1][0]];
+            query_state.last_vote = [extent[0][1], extent[1][1]];
         }
         renderAll();
+        history.replaceState(query_state, "Query", 
+                             location.origin + location.pathname + "?state=" + $.param({ query: query_state }));
+    });
+
+    brush.on("brushstart", function() {
+        if (brush.empty()) {
+            delete query_state.last_appearance;
+            delete query_state.last_vote;
+        } else {
+            var extent = brush.extent();
+            query_state.last_appearance = [extent[0][0], extent[1][0]];
+            query_state.last_vote = [extent[0][1], extent[1][1]];
+        }
+        save_query_state();
     });
 
     //////////////////////////////////////////////////////////////////////////
@@ -480,11 +537,15 @@ function create_vis(obj, player_csv, election_csv)
             return Math.floor(t) * range / 10 + min;
         });
         dimensions.push(dimension);
+        dimension_filter_map[stat] = function(v) {
+            dimension.filterRange(v);
+        };
         groups.push(group);
         if (stat === "last_appearance" ||
             stat === "last_vote")
             return;
         var c = barChart()
+            .query_key(stat)
             .dimension(dimension)
             .group(group)
             .x(d3.scale.linear()
@@ -494,7 +555,7 @@ function create_vis(obj, player_csv, election_csv)
         charts.push(c);
     });
     last_vote_dimension = dimensions[26];
-    last_year_dimension = dimensions[28];
+    last_appearance_dimension = dimensions[28];
 
     d3.select("#charts")
         .selectAll(".chart")
@@ -526,7 +587,8 @@ function barChart() {
         brushDirty,
         dimension,
         group,
-        round;
+        round,
+        query_key;
 
     function chart(div) {
         var width = x.range()[1],
@@ -643,9 +705,17 @@ function barChart() {
     brush.on("brushstart.chart", function() {
         var div = d3.select(this.parentNode.parentNode.parentNode);
         div.select(".title a").style("display", null);
+        save_query_state();
     });
 
+    var update_query_state = query_state_updater(
+        brush,
+        function() { return query_key; },
+        function() { return brush.extent(); }
+    );
+
     brush.on("brush.chart", function() {
+        update_query_state();
         var g = d3.select(this.parentNode),
         extent = brush.extent();
         if (round) g.select(".brush")
@@ -666,6 +736,16 @@ function barChart() {
             dimension.filterAll();
         }
     });
+
+    chart.brush = function() {
+        return brush;
+    };
+
+    chart.query_key = function(_) {
+        if (!arguments.length) return query_key;
+        query_key = _;
+        return chart;
+    };
 
     chart.margin = function(_) {
         if (!arguments.length) return margin;
@@ -701,6 +781,7 @@ function barChart() {
             brush.clear();
             dimension.filterAll();
         }
+        update_query_state();
         brushDirty = true;
         return chart;
     };
@@ -720,9 +801,19 @@ function barChart() {
     return d3.rebind(chart, brush, "on");
 }
 
-d3.csv("player_data.csv", function(error, player_csv) {
-    d3.csv("election_data.csv", function(error, election_csv) {
-        var obj = create_players(player_csv, election_csv);
-        create_vis(obj, player_csv, election_csv);
+$(function() {
+    d3.csv("player_data.csv", function(error, player_csv) {
+        d3.csv("election_data.csv", function(error, election_csv) {
+            var obj = create_players(player_csv, election_csv);
+
+            create_vis(obj, player_csv, election_csv);
+
+            window.addEventListener("popstate", function(e) {
+                query_state = e.state;
+                replace_queries();
+                update_brushes();
+                renderAll();
+            });
+        });
     });
 });

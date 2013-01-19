@@ -14,7 +14,11 @@ THINGS TO DO
 
 - fix tick count for histograms
 
+- Scatterplots for position and induction method
+
 - New category: not yet inducted but eligible
+
+- Back and Forward button for queries.
 
 - Stylistic changes:
   - change td widths so table doesn't wiggle
