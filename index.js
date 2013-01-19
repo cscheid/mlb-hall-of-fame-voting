@@ -6,6 +6,7 @@ var formatNumber = d3.format(",d");
 var player_dots;
 var player_paths;
 var induction_method_dimension, player_position_dimension, name_dimension;
+var last_year_dimension, last_vote_dimension;
 var clicked_player;
 var charts = [];
 var dimensions = [];
@@ -45,7 +46,7 @@ function toggle_player(player)
             if (v === undefined)
                 v = player[c];
             else if (v === "NA")
-                v = "";
+                v = "-";
             document.getElementById("player-"+c).innerHTML = v;
         });
     }
@@ -60,9 +61,8 @@ function renderAll() {
     for (var i=0; i<selection.length; ++i) {
         shown[selection[i].Name] = 1;
     }
-    _.each([player_dots, player_paths], function(obj) {
-        obj.selectAll("rect")
-        .style("display", function(d) {
+    _.each([player_dots.selectAll("rect"), player_paths.selectAll("path")], function(obj) {
+        obj.style("display", function(d) {
             return shown[d.Name] || (d === clicked_player) ? "inline" : "none";
         });
     });
@@ -76,7 +76,7 @@ function create_vis(obj, player_csv, election_csv)
 
     // enrich player_csv with computed data from players
     _.each(player_csv, function(line) {
-        _.each(["first_vote", "last_vote", "first_appearance", "last_appearance"], function(f) {
+        _.each(["first_vote", "last_vote", "min_vote", "max_vote", "first_appearance", "last_appearance"], function(f) {
             line[f] = player_map[line.Name][f];
         });
     });
@@ -102,7 +102,7 @@ function create_vis(obj, player_csv, election_csv)
         .attr("width", width)
         .attr("height", height);
 
-    var trajectory_y = d3.scale.linear()
+    var y = d3.scale.linear()
         .domain([0, 100])
         .range([margin.top+height, margin.top]);
 
@@ -119,7 +119,7 @@ function create_vis(obj, player_csv, election_csv)
         .attr("class", "axis").call(xAxis);
 
     var yAxis = d3.svg.axis();
-    yAxis.scale(trajectory_y).tickFormat(d3.format("d"));
+    yAxis.scale(y).tickFormat(d3.format("d"));
     
     yAxis.orient("left");
     svg.append("g")
@@ -129,23 +129,23 @@ function create_vis(obj, player_csv, election_csv)
     svg.append("line")
         .attr("x1", x(first_year))
         .attr("x2", x(last_year))
-        .attr("y1", trajectory_y(5))
-        .attr("y2", trajectory_y(5))
+        .attr("y1", y(5))
+        .attr("y2", y(5))
         .attr("stroke", "red");
 
     svg.append("line")
         .attr("x1", x(first_year))
         .attr("x2", x(last_year))
-        .attr("y1", trajectory_y(75))
-        .attr("y2", trajectory_y(75))
+        .attr("y1", y(75))
+        .attr("y2", y(75))
         .attr("stroke", "green");
     
     for (i=1; i<=9; ++i){
       svg.append("line")
         .attr("x1", x(first_year))
         .attr("x2", x(last_year))
-        .attr("y1", trajectory_y(i*10))
-        .attr("y2", trajectory_y(i*10))
+        .attr("y1", y(i*10))
+        .attr("y2", y(i*10))
         .attr("stroke", "white");
     }
 
@@ -153,13 +153,15 @@ function create_vis(obj, player_csv, election_csv)
       svg.append("line")
         .attr("x1", x(i*10+1930))
         .attr("x2", x(i*10+1930))
-        .attr("y1", trajectory_y(0))
-        .attr("y2", trajectory_y(100))
+        .attr("y1", y(0))
+        .attr("y2", y(100))
         .attr("stroke", "white");
     }
 
+    var box0 = svg.append("g");
     var box1 = svg.append("g");
     var box2 = svg.append("g");
+    
     player_dots = box2;
     player_paths = box1;
 
@@ -183,7 +185,7 @@ function create_vis(obj, player_csv, election_csv)
         .attr("stroke", "none")
         .attr("x", function(player) { return x(player.last_appearance)-5; })
         .attr("y", function(player) { 
-            return trajectory_y(player.last_vote)-5; 
+            return y(player.last_vote)-5; 
         })
         .on("click", toggle_player)
         .on("mouseover", highlight_on)
@@ -201,7 +203,7 @@ function create_vis(obj, player_csv, election_csv)
         .y(function(a) { 
             var t = Number(a["pct"]);
             if (isNaN(t)) t = 100; // only happens for Lou Gehrig;
-            return trajectory_y(t); 
+            return y(t); 
         });
     
     box1.selectAll("path")
@@ -227,6 +229,27 @@ function create_vis(obj, player_csv, election_csv)
         .text(function(player) {
             return player.Name;
         });
+
+    //////////////////////////////////////////////////////////////////////////
+
+    var brush = d3.svg.brush();
+    brush.x(x);
+    brush.y(y);
+    var gBrush = box0.append("g").attr("class", "brush").call(brush);
+
+    brush.on("brush", function() {
+        if (brush.empty()) {
+            last_year_dimension.filterAll();
+            last_vote_dimension.filterAll();
+        } else {
+            var extent = brush.extent();
+            last_year_dimension.filterRange([extent[0][0], extent[1][0]]);
+            last_vote_dimension.filterRange([extent[0][1], extent[1][1]]);        
+        }
+        renderAll();
+    });
+
+    //////////////////////////////////////////////////////////////////////////
     
     svg.append("text")
 	.attr("class", "x label")
@@ -282,7 +305,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var induction_legend = d3.select("#induction_legend").append("svg")
         .attr("width", (width / 10) * 1.5)
-        .attr("height", margin.top + height + margin.bottom);
+        .attr("height", (margin.top + height + margin.bottom) * 0.23);
 
     var induction_legend_items = induction_legend.selectAll("g")
         .data(["Not yet inducted",
@@ -296,7 +319,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var induction_legend_y = d3.scale.linear()
         .domain([0, 6])
-        .range([margin.top, margin.top + 6 * 20]);
+        .range([5, 5 + 6 * 20]);
 
     var induction_legend_rects, induction_legend_texts;
     function update_induction_legend_query(d, i) {
@@ -342,8 +365,8 @@ function create_vis(obj, player_csv, election_csv)
     // position legend
 
     var position_legend = d3.select("#position_legend").append("svg")
-        .attr("width", (width / 10) * 0.5)
-        .attr("height", margin.top + height + margin.bottom);
+        .attr("width", (width / 10) * 1.5)
+        .attr("height", (margin.top + height + margin.bottom) * 0.6);
 
     var position_legend_items = position_legend.selectAll("g")
         .data(positions)
@@ -352,7 +375,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var position_legend_y = d3.scale.linear()
         .domain([0, positions.length])
-        .range([margin.top, margin.top + positions.length * 20]);
+        .range([5, 5 + positions.length * 20]);
 
     var position_legend_rects, position_legend_texts;
     function update_position_legend_query(d, i) {
@@ -412,7 +435,10 @@ function create_vis(obj, player_csv, election_csv)
         renderAll();
     };
 
-    var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus"];
+    var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", 
+                 // "AB", "R", 
+                 "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS",
+                 "min_vote", "max_vote", "first_vote", "last_vote", "first_appearance", "last_appearance"];
     var bounds = {
         "ERA": { min: 1.5, max: 5 },
         "SO": { min: 0, max: 3700 },
@@ -431,7 +457,6 @@ function create_vis(obj, player_csv, election_csv)
         "BB": { min: 0, max: 1900 },
         "H.1": { min: 0, max: 5000 }
     };
-
     _.each(stats, function(stat) {
         var min, max;
         var select = function(d) {
@@ -456,6 +481,9 @@ function create_vis(obj, player_csv, election_csv)
         });
         dimensions.push(dimension);
         groups.push(group);
+        if (stat === "last_appearance" ||
+            stat === "last_vote")
+            return;
         var c = barChart()
             .dimension(dimension)
             .group(group)
@@ -465,6 +493,8 @@ function create_vis(obj, player_csv, election_csv)
         c._stat = stat;
         charts.push(c);
     });
+    last_vote_dimension = dimensions[26];
+    last_year_dimension = dimensions[28];
 
     d3.select("#charts")
         .selectAll(".chart")
@@ -607,16 +637,6 @@ function barChart() {
                 + "H" + (2 * y - 8)
                 + "M" + (y + 8) + "," + (4.5 * x)
                 + "H" + (2 * y - 8);
-
-            return "M" + (.5 * x) + "," + y
-                + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6)
-                + "V" + (2 * y - 6)
-                + "A6,6 0 0 " + e + " " + (.5 * x) + "," + (2 * y)
-                + "Z"
-                + "M" + (2.5 * x) + "," + (y + 8)
-                + "V" + (2 * y - 8)
-                + "M" + (4.5 * x) + "," + (y + 8)
-                + "V" + (2 * y - 8);
         }
     }
 

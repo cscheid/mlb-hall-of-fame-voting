@@ -1,23 +1,27 @@
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+THINGS TO DO
+
 - "some weird artifacts....Warren Spahn appears to start at zero (dont think that is true).." -Chris
  -- explain Spahn, Lefty Grove, maybe Gehrig, Clemente, too:
    -- Kenny to correct Lefty Grove in the data (remove 1960 votes from data)
    -- For Spahn, DiMaggio, consider including playing career as a variable, so we can select only ballot years when player was retired. Kenny to gather data.
    -- For Gehrig, Clemente, consider appending explanation to name, or add two short footnotes. Might need footnote for (1) negro leagues committee, and (2) runoff election, in addition to the Gehrig and Clemente explanations (because they got in via special election).
 
-
 - Add histograms for:
- 2. Initial Vote %
- 3. Final Vote %
- 4. Min vote percentage
- 5. Max vote percentage
- 6. First Year on ballot
- 7. Last Year on ballot
  8. Number of years on ballot
 
 - colors: switch orange and blue? And maybe add a toggle to choose whether to color points by method of induction vs. position.
 
 - fix tick count for histograms
 
-- brush on trajectory graph?
+- New category: not yet inducted but eligible
 
+- Stylistic changes:
+  - change td widths so table doesn't wiggle
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+THINGS TO NOTE
+
+(Notes from Carlos)
+- We ran out of dimensions to use (max is 32). I'm removing the AB and R histograms; they seem very strongly correlated with H.
 

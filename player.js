@@ -44,12 +44,12 @@ function create_players(csv, csv2) {
         });
         var first_appearance = player.Appearances[0];
         var last_appearance = player.Appearances[player.Appearances.length-1];
-        set_value(player, "first_appearance", first_appearance.Year);
-        set_value(player, "last_appearance", last_appearance.Year);
-        set_value(player, "first_vote", first_appearance.pct);
-        set_value(player, "last_vote", last_appearance.pct);
-        set_value(player, "min_vote", d3.min(player.Appearances, function(i) { return i.pct; }));
-        set_value(player, "max_vote", d3.max(player.Appearances, function(i) { return i.pct; }));
+        set_value(player, "first_appearance", Number(first_appearance.Year));
+        set_value(player, "last_appearance", Number(last_appearance.Year));
+        set_value(player, "first_vote", Number(first_appearance.pct));
+        set_value(player, "last_vote", Number(last_appearance.pct));
+        set_value(player, "min_vote", d3.min(player.Appearances, function(i) { return Number(i.pct); }));
+        set_value(player, "max_vote", d3.max(player.Appearances, function(i) { return Number(i.pct); }));
         
         player.position = player.Stats.position;
     }
