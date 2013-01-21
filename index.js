@@ -1,4 +1,5 @@
 var width = window.innerWidth * 0.70, height = window.innerHeight * 0.5;
+
 var margin = { top: 20, right: 20, bottom: 40, left: 60 };
 var first_year = 1936, last_year = 2013;
 var cf, all, chart;
@@ -22,15 +23,15 @@ var _debugging = false;
 
 var hist_title = {
     "Yrs": "Years",
-    "H.1": "H (allowed)",
-    "HR.1": "HR (allowed)",
-    "BB.1": "BB (allowed)",
-    "min_vote": "min. %",
-    "max_vote": "max. %",
-    "first_vote": "first %",
-    "last_vote": "last %",
-    "first_appearance": "first year on ballot",
-    "last_appearance": "last year on ballot"
+    "H.1": "H&nbsp;(allowed)",
+    "HR.1": "HR&nbsp;(allowed)",
+    "BB.1": "BB&nbsp;(allowed)",
+    "min_vote": "min.&nbsp;%",
+    "max_vote": "max.&nbsp;%",
+    "first_vote": "first&nbsp;%",
+    "last_vote": "last&nbsp;%",
+    "first_appearance": "first&nbsp;year&nbsp;on&nbsp;ballot",
+    "last_appearance": "last&nbsp;year&nbsp;on&nbsp;ballot"
 };
 
 function fresh_vis_state()
@@ -674,16 +675,20 @@ function create_vis(obj, player_csv, election_csv)
     last_vote_dimension = dimensions[26];
     last_appearance_dimension = dimensions[28];
 
-    d3.select("#charts")
+    var t = d3.select("#charts")
         .selectAll(".chart")
         .data(charts)
         .enter()
         .append("div")
-        .attr("id", function(d) { return d._stat + "-chart"; })
-        .attr("class", "chart")
+        .attr("id", function(d) { return d._stat + "-chart"; });
+
+    t.attr("class", "chart")
         .append("div")
+        .attr("class", "chart-opts");
+
+    t.append("div")
         .attr("class", "title")
-        .text(function(d) { return hist_title[d._stat] || d._stat; });
+        .html(function(d) { return hist_title[d._stat] || d._stat; });
 
     chart = d3.selectAll(".chart")
         .data(charts)
@@ -731,26 +736,28 @@ function barChart() {
 
             // Create the skeletal chart.
             if (g.empty()) {
-                div.select(".title")
+                div.select(".chart-opts")
                     .append("a")
                     .attr("href", "javascript:hide(" + id + ")")
                     .attr("class", "hide")
                     .text("hide");
                 
-                div.select(".title").append("a")
+                div.select(".chart-opts").append("a")
                     .attr("href", "javascript:reset(" + id + ")")
                     .attr("class", "reset")
                     .text("reset")
                     .style("display", "none");
 
-                show_span = d3.select("#show")
+                show_span = d3.select("#show");
+
+                show_span
                     .append("span")
                     .attr("id", query_key + "-show")
                     .style("display", "none")
-                    .style("padding", "1em")
                     .append("a")
                     .attr("href", "javascript:show(" + id + ")")
-                    .text(hist_title[query_key] || query_key);
+                    .html(hist_title[query_key] || query_key);
+                show_span.append("span").text(" ");
 
                 g = div.append("svg")
                     .attr("width", width + margin.left + margin.right)
@@ -943,6 +950,8 @@ function barChart() {
 }
 
 $(function() {
+    $("#show").css("width", window.innerWidth * 0.70);
+
     d3.csv("player_data.csv", function(error, player_csv) {
         d3.csv("election_data.csv", function(error, election_csv) {
             var obj = create_players(player_csv, election_csv);

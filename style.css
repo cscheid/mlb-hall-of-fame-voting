@@ -34,8 +34,15 @@ body {
     font-size: 11px;
 }
 
+hr {
+  margin-left: 50px;
+  margin-right: 50px;
+}
+
 h2 {
   margin: 0px;
+  margin-left: 50px;
+  margin-right: 50px;
   padding: 0px;
 }
 
@@ -45,13 +52,18 @@ h2 {
 
 .chart {
   display: inline-block;
-  height: 151px;
+  height: 121px;
   margin-bottom: 20px;
 }
 
-
 .reset {
-  padding-left: 1em;
+  padding-left: 0.5em;
+  font-size: smaller;
+  color: #ccc;
+}
+
+.hide {
+  padding-left: 0em;
   font-size: smaller;
   color: #ccc;
 }
@@ -90,4 +102,8 @@ th {
 
 .tablename {
     width: 10em;
+}
+
+p {
+    margin-left: 75px;
 }

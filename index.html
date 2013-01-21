@@ -2,121 +2,8 @@
 <meta charset="utf-8">
 <html>
 <head>
-<style>
-
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-.box {
-  font: 10px "Helvetica Neue", 10px Helvetica, 10px Arial, 10px sans-serif;
-}
-
-.box line,
-.box rect,
-.box circle {
-  fill: #fff;
-  stroke: #000;
-  stroke-width: 1.5px;
-}
-
-.box .center {
-  stroke-dasharray: 3,3;
-}
-
-.box .outlier {
-  fill: none;
-  stroke: #ccc;
-}
-.axis path,
-.axis line {
-    fill: none;
-    stroke: black;
-    shape-rendering: crispEdges;
-}
-
-.axis text {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 11px;
-}
-
-hr {
-  margin-left: 50px;
-  margin-right: 50px;
-}
-
-h2 {
-  margin: 0px;
-  margin-left: 50px;
-  margin-right: 50px;
-  padding: 0px;
-}
-
-#charts {
-  padding: 10px 0;
-}
-
-.chart {
-  display: inline-block;
-  height: 101px;
-  margin-bottom: 20px;
-}
-
-
-.reset {
-  padding-left: 1em;
-  font-size: smaller;
-  color: #ccc;
-}
-
-.hide {
-  padding-left: 1em;
-  font-size: smaller;
-  color: #ccc;
-}
-
-.background.bar {
-  fill: #ccc;
-}
-
-.foreground.bar {
-  fill: #246;
-}
-
-.axis path, .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-.axis text {
-  font: 10px sans-serif;
-}
-
-.brush rect.extent {
-  fill: steelblue;
-  fill-opacity: .125;
-}
-
-.brush .resize path {
-  fill: #eee;
-  stroke: #666;
-}
-
-th {
-    text-align: left;
-}
-
-.tablename {
-    width: 10em;
-}
-
-p {
-    margin-left: 75px;
-}
-
-</style>
-<title>MLB Hall of Fame voting</title>
+  <link rel="stylesheet" href="style.css"/>
+  <title>MLB Hall of Fame voting</title>
 </head>
 <body>
   <script src="lib/d3.v3.min.js"></script>
@@ -187,8 +74,11 @@ p {
   </div>
   <div id="charts" style="margin-left: 50px; margin-right:50px">
   </div>
-  <div id="show" style="margin-left: 50px; margin-right:50px"> Show histogram:
+  <div style="margin-left: 50px; margin-right:50px"> Show histogram:
+    <div id="show" style="overflow: auto">
+    </div>
   </div>
+  <div style="clear: both"></div>
   <hr>
   <p>This is a test of some text. Let's select all <a href="#state=state%5Binduction_method%5D=2">real inductees</a> Now the <a href="#state=state%5Bposition%5D=2048">suit</a>!
     <h2>Acknowledgments</h2>
