@@ -1,6 +1,5 @@
 var width = window.innerWidth * 0.70, height = window.innerHeight * 0.5;
-
-var margin = { top: 20, right: 20, bottom: 40, left: 60 };
+var margin = { top: 10, right: 20, bottom: 40, left: 50 };
 var first_year = 1936, last_year = 2013;
 var cf, all, chart;
 var formatNumber = d3.format(",d");
@@ -384,8 +383,8 @@ function create_vis(obj, player_csv, election_csv)
     svg.append("text")
 	.attr("class", "y label")
 	.attr("text-anchor", "end")
-	.attr("x", -height/2 + margin.left)
-	.attr("y", margin.top)
+	.attr("x", -height/2 + margin.left + 50)
+	.attr("y", margin.top + 10)
 	.attr("transform", "rotate(-90)")
 	.text("Percentage of BBWAA Ballots");
 
@@ -429,7 +428,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var induction_legend = d3.select("#induction_legend").append("svg")
         .attr("width", (width / 10) * 3.5)
-        .attr("height", (margin.top + height + margin.bottom) * 0.36);
+        .attr("height", "120px");
 
     var induction_legend_items = induction_legend.selectAll("g")
         .data(["Not yet inducted",
@@ -446,7 +445,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var induction_legend_y = d3.scale.linear()
         .domain([0, 6])
-        .range([5, 5 + 6 * 17]);
+        .range([5, 5 + 6 * 14]);
 
     var induction_legend_rects, induction_legend_texts;
 
@@ -488,6 +487,7 @@ function create_vis(obj, player_csv, election_csv)
         .on("click", update_induction_legend_query);
 
     induction_legend_items.append("text")
+        .attr("class", "legend-text")
         .text(function(d) { return d; })
         .attr("x", 18)
         .attr("y", function(d, i) { return induction_legend_y(i) + 10; })
@@ -503,7 +503,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var position_legend = d3.select("#position_legend").append("svg")
         .attr("width", (width / 10) * 1.5)
-        .attr("height", (margin.top + height + margin.bottom) * 0.6);
+        .attr("height", "190px");
 
     var position_legend_items = position_legend.selectAll("g")
         .data(positions)
@@ -512,7 +512,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var position_legend_y = d3.scale.linear()
         .domain([0, positions.length])
-        .range([5, 5 + positions.length * 17]);
+        .range([5, 5 + positions.length * 14]);
 
     var position_legend_rects, position_legend_texts;
 
@@ -555,6 +555,7 @@ function create_vis(obj, player_csv, election_csv)
 
     position_legend_items.append("text")
         .text(function(d) { return d; })
+        .attr("class", "legend-text")
         .attr("x", 18)
         .attr("y", function(d, i) { return position_legend_y(i) + 10; })
         .style("cursor", "pointer")
@@ -667,7 +668,7 @@ function create_vis(obj, player_csv, election_csv)
             .dimension(dimension)
             .group(group)
             .x(d3.scale.linear()
-               .domain([min, min + (range * 1.1)])
+               .domain([min + (range * 1.1), min])
                .range([0, 8 * 11]));
         c._stat = stat;
         charts.push(c);
@@ -823,7 +824,7 @@ function barChart() {
                 if (x(d.key) === Infinity ||
                     y(d.value) === Infinity)
                     continue;
-                path.push("M0,", x(d.key), "H", y(d.value), "v7H0");
+                path.push("M0,", x(d.key), "H", y(d.value), "v-7H0");
             }
             return path.join("");
         }

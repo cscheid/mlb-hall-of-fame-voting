@@ -107,3 +107,7 @@ th {
 p {
     margin-left: 75px;
 }
+
+.legend-text {
+    font: 10pt Helvetica Neue, sans-serif;
+}
