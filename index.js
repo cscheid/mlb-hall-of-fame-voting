@@ -22,21 +22,21 @@ var _debugging = false;
 
 var hist_title = {
     "Yrs": "Years",
-    "H.1": "Hs given up",
-    "HR.1": "HRs given up",
-    "BB.1": "BBs given up",
-    "min_vote": "min. vote %",
-    "min_vote": "max. vote %",
-    "first_vote": "first vote %",
-    "last_vote": "last vote %",
-    "first_appearance": "Year of first ballot",
-    "last_appearance": "Year of last ballot"
+    "H.1": "H (allowed)",
+    "HR.1": "HR (allowed)",
+    "BB.1": "BB (allowed)",
+    "min_vote": "min. %",
+    "max_vote": "max. %",
+    "first_vote": "first %",
+    "last_vote": "last %",
+    "first_appearance": "first year on ballot",
+    "last_appearance": "last year on ballot"
 };
 
 function fresh_vis_state()
 {
     return { 
-        shown_histograms: {} 
+        shown_histograms: [2,3,5,6,7,9,10,11,13,14,15,16,17,19,20]
     };
 }
 
@@ -50,9 +50,12 @@ function state_url()
         "#state=" + $.param({ state: vis_state });
 }
 
-function save_vis_state()
+function save_vis_state(replace)
 {
-    history.pushState(vis_state, "Query", state_url());
+    if (replace)
+        history.replaceState(vis_state, "Query", state_url());
+    else
+        history.pushState(vis_state, "Query", state_url());
 }
 
 function vis_state_updater(brush, query_key_accessor, brush_state_accessor) {
@@ -578,14 +581,31 @@ function create_vis(obj, player_csv, election_csv)
         renderAll();
     };
 
-    window.hide = function(i) {
-        d3.select(document.getElementById(charts[i].query_key() + "-chart")).style("display", "none");
-        d3.select(document.getElementById(charts[i].query_key() + "-show")).style("display", null);
+    window.hide = function(i, mask_vis_state) {
+        var chart = charts[i];
+        if (_.isUndefined(chart))
+            return;
+        var stat = chart.query_key();
+        if (!mask_vis_state) {
+            vis_state.shown_histograms = vis_state.shown_histograms.filter(function(d) { return d !== i; });
+            save_vis_state();
+        }
+        d3.select(document.getElementById(stat + "-chart")).style("display", "none");
+        d3.select(document.getElementById(stat + "-show")).style("display", null);
+        
     };
 
-    window.show = function(i) {
-        d3.select(document.getElementById(charts[i].query_key() + "-chart")).style("display", null);
-        d3.select(document.getElementById(charts[i].query_key() + "-show")).style("display", "none");
+    window.show = function(i, mask_vis_state) {
+        var chart = charts[i];
+        if (_.isUndefined(chart))
+            return;
+        var stat = chart.query_key();
+        if (!mask_vis_state && vis_state.shown_histograms.indexOf(i) === -1) {
+            vis_state.shown_histograms.push(i);
+            save_vis_state();
+        }
+        d3.select(document.getElementById(stat + "-chart")).style("display", null);
+        d3.select(document.getElementById(stat + "-show")).style("display", "none");
     };
 
     var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", 
@@ -929,26 +949,36 @@ $(function() {
 
             create_vis(obj, player_csv, election_csv);
 
-            window.addEventListener("popstate", function(e) {
-                vis_state = e.state || $.deparam(location.hash.substr(7)).state || 
-                    fresh_vis_state();
+            function sync_to_vis_state() {
                 replace_queries();
                 update_brushes();
+                for (var i=0; i<27; ++i) {
+                    window.hide(i, true);
+                }
+                for (var k in vis_state.shown_histograms) {
+                    window.show(vis_state.shown_histograms[k], true);
+                }
                 renderAll();
+            }
+
+            window.addEventListener("popstate", function(e) {
+                vis_state = e.state || $.deparam(location.hash.substr(7), true).state || 
+                    fresh_vis_state();
+                sync_to_vis_state();
             });
 
             function update_from_hash(hash) {
                 if (hash.length > 7) {
-                    vis_state = $.deparam(hash.substr(7)).state;
-                    replace_queries();
-                    update_brushes();
-                    renderAll();
+                    vis_state = $.deparam(hash.substr(7), true).state;
+                    sync_to_vis_state();
                 }
             }
 
-            _.each([0, 1, 4, 8, 12, 18, 21, 22, 23, 24, 25, 26], function(i) {
-                window.hide(i);
-            });
+            sync_to_vis_state();
+            save_vis_state(true);
+            // _.each([0, 1, 4, 8, 12, 18, 21, 22, 23, 24, 25, 26], function(i) {
+            //     window.hide(i);
+            // });
 
             update_from_hash(location.hash);
         });
