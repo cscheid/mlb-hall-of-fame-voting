@@ -36,7 +36,7 @@ var hist_title = {
 function fresh_vis_state()
 {
     return { 
-        shown_histograms: [2,3,5,6,7,9,10,11,13,14,15,16,17,19,20]
+        shown_histograms: [-1,2,3,5,6,7,9,10,11,13,14,15,16,17,19,20] // this jquery serialization sucks. If list is empty, we get no entry under the given key.
     };
 }
 
@@ -584,6 +584,8 @@ function create_vis(obj, player_csv, election_csv)
     };
 
     window.hide = function(i, mask_vis_state) {
+        if (!mask_vis_state)
+            window.reset(i);
         var chart = charts[i];
         if (_.isUndefined(chart))
             return;
@@ -806,8 +808,8 @@ function barChart() {
                 } else {
                     var extent = brush.extent();
                     g.selectAll("#clip-" + id + " rect")
-                        .attr("y", x(extent[0]))
-                        .attr("height", x(extent[1]) - x(extent[0]));
+                        .attr("y", Math.min(x(extent[1]), x(extent[0])))
+                        .attr("height", Math.abs(x(extent[0]) - x(extent[1])));
                 }
             }
 
@@ -822,7 +824,9 @@ function barChart() {
             while (++i < n) {
                 d = groups[i];
                 if (x(d.key) === Infinity ||
-                    y(d.value) === Infinity)
+                    y(d.value) === Infinity ||
+                    x(d.key) === -Infinity ||
+                    y(d.value) === -Infinity)
                     continue;
                 path.push("M0,", x(d.key), "H", y(d.value), "v-7H0");
             }
@@ -867,8 +871,8 @@ function barChart() {
             .selectAll(".resize")
             .style("display", null);
         g.select("#clip-" + id + " rect")
-            .attr("y", x(extent[0]))
-            .attr("height", x(extent[1]) - x(extent[0]));
+            .attr("y", Math.min(x(extent[0]), x(extent[1])))
+            .attr("height", Math.abs(x(extent[1]) - x(extent[0])));
         dimension.filterRange(extent);
     });
 
@@ -977,20 +981,15 @@ $(function() {
                 sync_to_vis_state();
             });
 
-            function update_from_hash(hash) {
-                if (hash.length > 7) {
-                    vis_state = $.deparam(hash.substr(7), true).state;
-                    sync_to_vis_state();
-                }
-            }
-
-            sync_to_vis_state();
-            save_vis_state(true);
             // _.each([0, 1, 4, 8, 12, 18, 21, 22, 23, 24, 25, 26], function(i) {
             //     window.hide(i);
             // });
 
-            update_from_hash(location.hash);
+            if (location.hash.length > 7) {
+                vis_state = $.deparam(location.hash.substr(7), true).state;
+            }
+            sync_to_vis_state();
+            save_vis_state(true);
         });
     });
 });
