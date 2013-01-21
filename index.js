@@ -1,5 +1,5 @@
 var width = window.innerWidth * 0.70, height = window.innerHeight * 0.5;
-var margin = { top: 20, right: 20, bottom: 40, left: 60 };
+var margin = { top: 10, right: 20, bottom: 40, left: 50 };
 var first_year = 1936, last_year = 2013;
 var cf, all, chart;
 var formatNumber = d3.format(",d");
@@ -13,13 +13,34 @@ var dimensions = [];
 var groups = [];
 var lines = {};
 var dots = {};
-var vis_state = { shown_histograms: {} };
 var dimension_filter_map = {};
 var trajectory_brush;
 var refresh_trajectory_brush;
 var redraw_induction_legend_query;
 var redraw_position_legend_query;
 var _debugging = false;
+
+var hist_title = {
+    "Yrs": "Years",
+    "H.1": "H&nbsp;(allowed)",
+    "HR.1": "HR&nbsp;(allowed)",
+    "BB.1": "BB&nbsp;(allowed)",
+    "min_vote": "min.&nbsp;%",
+    "max_vote": "max.&nbsp;%",
+    "first_vote": "first&nbsp;%",
+    "last_vote": "last&nbsp;%",
+    "first_appearance": "first&nbsp;year&nbsp;on&nbsp;ballot",
+    "last_appearance": "last&nbsp;year&nbsp;on&nbsp;ballot"
+};
+
+function fresh_vis_state()
+{
+    return { 
+        shown_histograms: [-1,2,3,5,6,7,9,10,11,13,14,15,16,17,19,20] // this jquery serialization sucks. If list is empty, we get no entry under the given key.
+    };
+}
+
+var vis_state = fresh_vis_state();
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -29,9 +50,12 @@ function state_url()
         "#state=" + $.param({ state: vis_state });
 }
 
-function save_vis_state()
+function save_vis_state(replace)
 {
-    history.pushState(vis_state, "Query", state_url());
+    if (replace)
+        history.replaceState(vis_state, "Query", state_url());
+    else
+        history.pushState(vis_state, "Query", state_url());
 }
 
 function vis_state_updater(brush, query_key_accessor, brush_state_accessor) {
@@ -359,8 +383,8 @@ function create_vis(obj, player_csv, election_csv)
     svg.append("text")
 	.attr("class", "y label")
 	.attr("text-anchor", "end")
-	.attr("x", -height/2 + margin.left)
-	.attr("y", margin.top)
+	.attr("x", -height/2 + margin.left + 50)
+	.attr("y", margin.top + 10)
 	.attr("transform", "rotate(-90)")
 	.text("Percentage of BBWAA Ballots");
 
@@ -404,7 +428,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var induction_legend = d3.select("#induction_legend").append("svg")
         .attr("width", (width / 10) * 3.5)
-        .attr("height", (margin.top + height + margin.bottom) * 0.36);
+        .attr("height", "120px");
 
     var induction_legend_items = induction_legend.selectAll("g")
         .data(["Not yet inducted",
@@ -421,7 +445,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var induction_legend_y = d3.scale.linear()
         .domain([0, 6])
-        .range([5, 5 + 6 * 17]);
+        .range([5, 5 + 6 * 14]);
 
     var induction_legend_rects, induction_legend_texts;
 
@@ -463,6 +487,7 @@ function create_vis(obj, player_csv, election_csv)
         .on("click", update_induction_legend_query);
 
     induction_legend_items.append("text")
+        .attr("class", "legend-text")
         .text(function(d) { return d; })
         .attr("x", 18)
         .attr("y", function(d, i) { return induction_legend_y(i) + 10; })
@@ -478,7 +503,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var position_legend = d3.select("#position_legend").append("svg")
         .attr("width", (width / 10) * 1.5)
-        .attr("height", (margin.top + height + margin.bottom) * 0.6);
+        .attr("height", "190px");
 
     var position_legend_items = position_legend.selectAll("g")
         .data(positions)
@@ -487,7 +512,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var position_legend_y = d3.scale.linear()
         .domain([0, positions.length])
-        .range([5, 5 + positions.length * 17]);
+        .range([5, 5 + positions.length * 14]);
 
     var position_legend_rects, position_legend_texts;
 
@@ -530,6 +555,7 @@ function create_vis(obj, player_csv, election_csv)
 
     position_legend_items.append("text")
         .text(function(d) { return d; })
+        .attr("class", "legend-text")
         .attr("x", 18)
         .attr("y", function(d, i) { return position_legend_y(i) + 10; })
         .style("cursor", "pointer")
@@ -557,20 +583,40 @@ function create_vis(obj, player_csv, election_csv)
         renderAll();
     };
 
-    window.hide = function(i) {
-        d3.select(document.getElementById(charts[i].query_key() + "-chart")).style("display", "none");
-        d3.select(document.getElementById(charts[i].query_key() + "-show")).style("display", null);
+    window.hide = function(i, mask_vis_state) {
+        if (!mask_vis_state)
+            window.reset(i);
+        var chart = charts[i];
+        if (_.isUndefined(chart))
+            return;
+        var stat = chart.query_key();
+        if (!mask_vis_state) {
+            vis_state.shown_histograms = vis_state.shown_histograms.filter(function(d) { return d !== i; });
+            save_vis_state();
+        }
+        d3.select(document.getElementById(stat + "-chart")).style("display", "none");
+        d3.select(document.getElementById(stat + "-show")).style("display", null);
+        
     };
 
-    window.show = function(i) {
-        d3.select(document.getElementById(charts[i].query_key() + "-chart")).style("display", null);
-        d3.select(document.getElementById(charts[i].query_key() + "-show")).style("display", "none");
+    window.show = function(i, mask_vis_state) {
+        var chart = charts[i];
+        if (_.isUndefined(chart))
+            return;
+        var stat = chart.query_key();
+        if (!mask_vis_state && vis_state.shown_histograms.indexOf(i) === -1) {
+            vis_state.shown_histograms.push(i);
+            save_vis_state();
+        }
+        d3.select(document.getElementById(stat + "-chart")).style("display", null);
+        d3.select(document.getElementById(stat + "-show")).style("display", "none");
     };
 
     var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", 
                  // "AB", "R", 
                  "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS",
                  "min_vote", "max_vote", "first_vote", "last_vote", "first_appearance", "last_appearance"];
+
     var bounds = {
         "ERA": { min: 1.5, max: 5 },
         "SO": { min: 0, max: 3700 },
@@ -624,7 +670,7 @@ function create_vis(obj, player_csv, election_csv)
             .dimension(dimension)
             .group(group)
             .x(d3.scale.linear()
-               .domain([min, min + (range * 1.1)])
+               .domain([min + (range * 1.1), min])
                .range([0, 8 * 11]));
         c._stat = stat;
         charts.push(c);
@@ -632,16 +678,20 @@ function create_vis(obj, player_csv, election_csv)
     last_vote_dimension = dimensions[26];
     last_appearance_dimension = dimensions[28];
 
-    d3.select("#charts")
+    var t = d3.select("#charts")
         .selectAll(".chart")
         .data(charts)
         .enter()
         .append("div")
-        .attr("id", function(d) { return d._stat + "-chart"; })
-        .attr("class", "chart")
+        .attr("id", function(d) { return d._stat + "-chart"; });
+
+    t.attr("class", "chart")
         .append("div")
+        .attr("class", "chart-opts");
+
+    t.append("div")
         .attr("class", "title")
-        .text(function(d) { return d._stat; });
+        .html(function(d) { return hist_title[d._stat] || d._stat; });
 
     chart = d3.selectAll(".chart")
         .data(charts)
@@ -689,26 +739,28 @@ function barChart() {
 
             // Create the skeletal chart.
             if (g.empty()) {
-                div.select(".title")
+                div.select(".chart-opts")
                     .append("a")
                     .attr("href", "javascript:hide(" + id + ")")
                     .attr("class", "hide")
                     .text("hide");
                 
-                div.select(".title").append("a")
+                div.select(".chart-opts").append("a")
                     .attr("href", "javascript:reset(" + id + ")")
                     .attr("class", "reset")
                     .text("reset")
                     .style("display", "none");
 
-                show_span = d3.select("#show")
+                show_span = d3.select("#show");
+
+                show_span
                     .append("span")
                     .attr("id", query_key + "-show")
                     .style("display", "none")
-                    .style("padding", "1em")
                     .append("a")
                     .attr("href", "javascript:show(" + id + ")")
-                    .text(query_key);
+                    .html(hist_title[query_key] || query_key);
+                show_span.append("span").text(" ");
 
                 g = div.append("svg")
                     .attr("width", width + margin.left + margin.right)
@@ -756,8 +808,8 @@ function barChart() {
                 } else {
                     var extent = brush.extent();
                     g.selectAll("#clip-" + id + " rect")
-                        .attr("y", x(extent[0]))
-                        .attr("height", x(extent[1]) - x(extent[0]));
+                        .attr("y", Math.min(x(extent[1]), x(extent[0])))
+                        .attr("height", Math.abs(x(extent[0]) - x(extent[1])));
                 }
             }
 
@@ -772,9 +824,11 @@ function barChart() {
             while (++i < n) {
                 d = groups[i];
                 if (x(d.key) === Infinity ||
-                    y(d.value) === Infinity)
+                    y(d.value) === Infinity ||
+                    x(d.key) === -Infinity ||
+                    y(d.value) === -Infinity)
                     continue;
-                path.push("M0,", x(d.key), "H", y(d.value), "v7H0");
+                path.push("M0,", x(d.key), "H", y(d.value), "v-7H0");
             }
             return path.join("");
         }
@@ -817,8 +871,8 @@ function barChart() {
             .selectAll(".resize")
             .style("display", null);
         g.select("#clip-" + id + " rect")
-            .attr("y", x(extent[0]))
-            .attr("height", x(extent[1]) - x(extent[0]));
+            .attr("y", Math.min(x(extent[0]), x(extent[1])))
+            .attr("height", Math.abs(x(extent[1]) - x(extent[0])));
         dimension.filterRange(extent);
     });
 
@@ -901,33 +955,41 @@ function barChart() {
 }
 
 $(function() {
+    $("#show").css("width", window.innerWidth * 0.70);
+
     d3.csv("player_data.csv", function(error, player_csv) {
         d3.csv("election_data.csv", function(error, election_csv) {
             var obj = create_players(player_csv, election_csv);
 
             create_vis(obj, player_csv, election_csv);
 
-            window.addEventListener("popstate", function(e) {
-                vis_state = e.state || $.deparam(location.hash.substr(7)).state || {};
+            function sync_to_vis_state() {
                 replace_queries();
                 update_brushes();
-                renderAll();
-            });
-
-            function update_from_hash(hash) {
-                if (hash.length > 7) {
-                    vis_state = $.deparam(hash.substr(7)).state;
-                    replace_queries();
-                    update_brushes();
-                    renderAll();
+                for (var i=0; i<27; ++i) {
+                    window.hide(i, true);
                 }
+                for (var k in vis_state.shown_histograms) {
+                    window.show(vis_state.shown_histograms[k], true);
+                }
+                renderAll();
             }
 
-            _.each([0, 1, 4, 8, 12, 18, 21, 22, 23, 24, 25, 26], function(i) {
-                window.hide(i);
+            window.addEventListener("popstate", function(e) {
+                vis_state = e.state || $.deparam(location.hash.substr(7), true).state || 
+                    fresh_vis_state();
+                sync_to_vis_state();
             });
 
-            update_from_hash(location.hash);
+            // _.each([0, 1, 4, 8, 12, 18, 21, 22, 23, 24, 25, 26], function(i) {
+            //     window.hide(i);
+            // });
+
+            if (location.hash.length > 7) {
+                vis_state = $.deparam(location.hash.substr(7), true).state;
+            }
+            sync_to_vis_state();
+            save_vis_state(true);
         });
     });
 });
