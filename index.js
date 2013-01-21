@@ -614,8 +614,7 @@ function create_vis(obj, player_csv, election_csv)
     var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", 
                  // "AB", "R", 
                  "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS",
-                 "min_vote", "max_vote", "first_vote", "last_vote", "first_appearance", "last_appearance",
-                 "Num.Years.On.Ballot"
+                 "min_vote", "max_vote", "first_vote", "last_vote", "first_appearance", "last_appearance", "Num.Years.On.Ballot"
                  ];
                  // , "years_on_ballot"];
 
@@ -679,8 +678,8 @@ function create_vis(obj, player_csv, election_csv)
         c._stat = stat;
         charts.push(c);
     });
-    last_vote_dimension = dimensions[26];
-    last_appearance_dimension = dimensions[28];
+    last_vote_dimension = dimensions[25];
+    last_appearance_dimension = dimensions[27];
 
     var t = d3.select("#charts")
         .selectAll(".chart")
