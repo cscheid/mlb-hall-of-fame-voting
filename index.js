@@ -13,13 +13,34 @@ var dimensions = [];
 var groups = [];
 var lines = {};
 var dots = {};
-var vis_state = { shown_histograms: {} };
 var dimension_filter_map = {};
 var trajectory_brush;
 var refresh_trajectory_brush;
 var redraw_induction_legend_query;
 var redraw_position_legend_query;
 var _debugging = false;
+
+var hist_title = {
+    "Yrs": "Years",
+    "H.1": "Hs given up",
+    "HR.1": "HRs given up",
+    "BB.1": "BBs given up",
+    "min_vote": "min. vote %",
+    "min_vote": "max. vote %",
+    "first_vote": "first vote %",
+    "last_vote": "last vote %",
+    "first_appearance": "Year of first ballot",
+    "last_appearance": "Year of last ballot"
+};
+
+function fresh_vis_state()
+{
+    return { 
+        shown_histograms: {} 
+    };
+}
+
+var vis_state = fresh_vis_state();
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -571,6 +592,7 @@ function create_vis(obj, player_csv, election_csv)
                  // "AB", "R", 
                  "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS",
                  "min_vote", "max_vote", "first_vote", "last_vote", "first_appearance", "last_appearance"];
+
     var bounds = {
         "ERA": { min: 1.5, max: 5 },
         "SO": { min: 0, max: 3700 },
@@ -641,7 +663,7 @@ function create_vis(obj, player_csv, election_csv)
         .attr("class", "chart")
         .append("div")
         .attr("class", "title")
-        .text(function(d) { return d._stat; });
+        .text(function(d) { return hist_title[d._stat] || d._stat; });
 
     chart = d3.selectAll(".chart")
         .data(charts)
@@ -708,7 +730,7 @@ function barChart() {
                     .style("padding", "1em")
                     .append("a")
                     .attr("href", "javascript:show(" + id + ")")
-                    .text(query_key);
+                    .text(hist_title[query_key] || query_key);
 
                 g = div.append("svg")
                     .attr("width", width + margin.left + margin.right)
@@ -908,7 +930,8 @@ $(function() {
             create_vis(obj, player_csv, election_csv);
 
             window.addEventListener("popstate", function(e) {
-                vis_state = e.state || $.deparam(location.hash.substr(7)).state || {};
+                vis_state = e.state || $.deparam(location.hash.substr(7)).state || 
+                    fresh_vis_state();
                 replace_queries();
                 update_brushes();
                 renderAll();
