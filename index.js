@@ -29,8 +29,9 @@ var hist_title = {
     "max_vote": "max.&nbsp;%",
     "first_vote": "first&nbsp;%",
     "last_vote": "last&nbsp;%",
-    "first_appearance": "first&nbsp;year&nbsp;on&nbsp;ballot",
-    "last_appearance": "last&nbsp;year&nbsp;on&nbsp;ballot"
+    "first_appearance": "first&nbsp;yr.&nbsp;on&nbsp;ballot",
+    "last_appearance": "last&nbsp;yr.&nbsp;on&nbsp;ballot",
+    "Num.Years.On.Ballot": "Yrs.&nbsp;on&nbsp;ballot"
 };
 
 function fresh_vis_state()
@@ -149,8 +150,6 @@ function toggle_player(player)
 
 function renderAll() {
     chart.each(function(method) { d3.select(this).call(method); });
-    if (_debugging)
-        debugger;
     var selection = dimensions[0].top(Infinity);
     var shown = {};
     for (var i=0; i<selection.length; ++i) {
@@ -612,10 +611,13 @@ function create_vis(obj, player_csv, election_csv)
         d3.select(document.getElementById(stat + "-show")).style("display", "none");
     };
 
-    var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", 
+    var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", 
                  // "AB", "R", 
                  "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS",
-                 "min_vote", "max_vote", "first_vote", "last_vote", "first_appearance", "last_appearance"];
+                 "min_vote", "max_vote", "first_vote", "last_vote", "first_appearance", "last_appearance",
+                 "Num.Years.On.Ballot"
+                 ];
+                 // , "years_on_ballot"];
 
     var bounds = {
         "ERA": { min: 1.5, max: 5 },
@@ -633,8 +635,10 @@ function create_vis(obj, player_csv, election_csv)
         "R": { min: 0, max: 2000 },
         "SV": { min: 0, max: 370 },
         "BB": { min: 0, max: 1900 },
-        "H.1": { min: 0, max: 5000 }
+        "H.1": { min: 0, max: 5000 },
+        "Num.Years.On.Ballot": {min: 0, max: 18}
     };
+
     _.each(stats, function(stat) {
         var min, max;
         var select = function(d) {
