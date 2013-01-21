@@ -1,4 +1,4 @@
-var width = window.innerWidth * 0.75, height = window.innerHeight * 0.5;
+var width = window.innerWidth * 0.70, height = window.innerHeight * 0.5;
 var margin = { top: 20, right: 20, bottom: 40, left: 60 };
 var first_year = 1936, last_year = 2013;
 var cf, all, chart;
@@ -362,7 +362,7 @@ function create_vis(obj, player_csv, election_csv)
 	.attr("x", -height/2 + margin.left)
 	.attr("y", margin.top)
 	.attr("transform", "rotate(-90)")
-	.text("Percentage of Ballots");
+	.text("Percentage of BBWAA Ballots");
 
     var name_box_value = "";
     function name_query(d) {
@@ -370,7 +370,7 @@ function create_vis(obj, player_csv, election_csv)
     }
 
     var positions = [
-        "P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "OF", "DH", "Manager", "Batters"
+        "P", "C", "1B", "2B", "3B", "SS", "LF", "CF", "RF", "OF", "DH", "MGR", "Batters"
     ];
 
     var position_mask = {};
@@ -403,18 +403,18 @@ function create_vis(obj, player_csv, election_csv)
     // induction legend
 
     var induction_legend = d3.select("#induction_legend").append("svg")
-        .attr("width", (width / 10) * 1.5)
-        .attr("height", (margin.top + height + margin.bottom) * 0.26);
+        .attr("width", (width / 10) * 3.5)
+        .attr("height", (margin.top + height + margin.bottom) * 0.36);
 
     var induction_legend_items = induction_legend.selectAll("g")
         .data(["Not yet inducted",
                "BBWAA > 75%",
                "BBWAA Special Election",
                "BBWAA Runoff Election",
-               "VC (Player)",
-               "Negro Leagues Committee",
-               "VC (Manager)",
-               "VC (Executive)"
+               "Veterans Committee (Player)",
+               "Veterans Committee (Manager)",
+               "Veterans Committee (Executive)",
+               "Negro Leagues Committee"
               ])
         .enter()
         .append("g");
@@ -579,9 +579,9 @@ function create_vis(obj, player_csv, election_csv)
         "IP": { min: 0, max: 5500 },
         "WHIP": { min: 0.85, max: 1.75 },
         "WAR": { min: 0, max: 125 },
-        "BA": { min: 0, max: 0.4 },
+        "BA": { min: 0.200, max: 0.350 },
         "W": { min: 0, max: 400 },
-        "OBP": { min: 0, max: 0.48 },
+        "OBP": { min: 0.25, max: 0.50 },
         "AB": { min: 0, max: 12000 },
         "BB.1": { min: 0, max: 2000 },
         "R": { min: 0, max: 2000 },
