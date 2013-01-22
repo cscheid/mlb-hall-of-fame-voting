@@ -767,9 +767,12 @@ function create_vis(obj, player_csv, election_csv)
         renderAll();
     });
 
-    window.show_common_stats = function() {
+    window.clear_query = function() {
         save_vis_state();
-        vis_state.shown_histograms = [-1, 0, 1, 2, 22, 23, 24, 26, 28];        sync_to_vis_state();
+        var old_histogram = vis_state.shown_histograms;
+        vis_state = fresh_vis_state();
+        vis_state.shown_histograms = old_histogram;
+        sync_to_vis_state();
     };
 
     window.show_common_stats = function() {
