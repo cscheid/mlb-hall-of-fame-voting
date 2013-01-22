@@ -14,10 +14,11 @@
 
   <script src="player.js"></script>
   <script src="index.js"></script>
-  <h2>MLB Hall of Fame voting</h2><hr>
+  <div style="float: right;margin-right:50px;margin-top:0.5em"><a href="#about">About</a> | <a href="#instructions">Instructions</a></div><h2>MLB Hall of Fame voting</h2>
+  <div style="clear:both;"></div><hr>
   <div>
     <div style="float: left; margin-left: 50px">
-      Player Name: <input type="text" id="searchbox"></div>
+      Player Name: <input type="text" id="searchbox">
     </div>
     <div style="float: right; margin-right: 50px">
       <table id="player-stats">
@@ -67,11 +68,11 @@
 	</tr>
       </table>
     </div>
-    <div style="clear: left"/>
+    <div style="clear: left"></div>
     <div id="totals" style="margin-left: 50px; margin-right: 50px"><span id="active">-</span> of <span id="total">-</span> players selected.<br><a href="#state=">Clear query</a>.</div>
-    <table><td><span style="margin-left: 50px" id="main"></span></td><td>
+    <table><tr><td style="padding-left: 50px"><span id="main"></span></td><td>
     <table><tr><td valign="top">Inducted by:</td></tr><tr><td><span id="induction_legend"></span></td></tr><tr><td>Position:</td></tr><tr><td><span id="position_legend"></span></td></tr></table>
-    </td></table>
+    </td></tr></table>
   </div>
   <div id="charts" style="margin-left: 50px; margin-right:50px">
   </div>
@@ -82,10 +83,13 @@
   <div style="clear: both"></div>
   <hr>
   <p>This is a test of some text. Let's select all <a href="#state=state%5Binduction_method%5D=2">real inductees</a> Now the <a href="#state=state%5Bposition%5D=2048">suit</a>!
-    <h2>Acknowledgments</h2>
-  <p>The raw data for this visualization comes from <a href="http://www.baseball-reference.com/">baseball-reference.com</a>.</p>
     <hr>
-    <p><a href="about.html">About</a> this visualization.</p>
+    <h2 id="instructions">How to use this</h2>
+      <p>As a general principle, clicking and dragging regions of the elements of this visualization will naturally create queries which restrict the data in the <b>other</b> elements to lie within the correct region. For example, if you drag a region in the WAR histogram between values 50 and 100, the other graphics will be updated to reflect only the players with WAR statistics between 50 and 100. When combined, these form logical intersections: we only show players which satisfy <b>all</b> criteria. The legends are clickable (to toggle visibility of different positions and induction methods), and the main trajectory plot is also draggable. Clicking on any of the circles shows career stats for that specific player.</p>
+      <p>The state of the visualization is encoded in the address bar. This means you can click back and forward like you would when navigating different webpages; if you like a particular state, you can copy the URL and share it over email, Facebook, Twitter, etc.</p>
+    <h2 id="about">About this visualization</h2>
+    <p>This visualization was created by <a href="http://cscheid.net">Carlos Scheidegger</a> and <a href="http://www2.research.att.com/~kshirley/">Kenny Shirley</a>. It uses <a href="http://d3js.org">d3</a>, <a href="http://square.github.com/crossfilter/">Crossfilter</a> (specifically, <a href="http://www.jasondavies.com/">Jason Davies's</a> custom-filter branch in his <a href="https://github.com/jasondavies/crossfilter">fork</a>, which supports arbitrary filters), and CSV files created in <a href="http://www.r-project.org">R</a>, using raw data from <a href="http://www.baseball-reference.com/">baseball-reference.com</a>.</p>
+<p>The histogram rendering uses a trivial variation of the demonstration in Crossfilter, and the selectable legend was written from scratch (it is also trivial). The history management code was written on top of <a href="http://jquery.com">jQuery</a>'s <tt>param</tt> and <a href="http://benalman.com/projects/jquery-bbq-plugin/">jquery-bbq's</a> <tt>deparam</tt> (although the code has more than a few hacks in it. Bizarrely, these two functions do not form a bijection: <tt>$.param</tt> is not an injection from JSON objects to strings. <a href="https://www.destroyallsoftware.com/talks/wat">WAT</a>)</p>
   <p></p>
 
 </body>
