@@ -1,5 +1,7 @@
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: 0px;
+  padding: 0px;
 }
 
 .box {
@@ -106,6 +108,7 @@ th {
 
 p {
     margin-left: 75px;
+    margin-right: 75px;
 }
 
 .legend-text {

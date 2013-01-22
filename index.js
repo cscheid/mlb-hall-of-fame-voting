@@ -616,7 +616,12 @@ function create_vis(obj, player_csv, election_csv)
                  "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS",
                  "min_vote", "max_vote", "first_vote", "last_vote", "first_appearance", "last_appearance", "Num.Years.On.Ballot"
                  ];
-                 // , "years_on_ballot"];
+
+    var player_type_color = ["#000000",
+                             "#008080",
+                             "#0080FF"];
+
+    var player_types = [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0];
 
     var bounds = {
         "ERA": { min: 1.5, max: 5 },
@@ -638,7 +643,7 @@ function create_vis(obj, player_csv, election_csv)
         "Num.Years.On.Ballot": {min: 0, max: 18}
     };
 
-    _.each(stats, function(stat) {
+    _.each(stats, function(stat, stat_id) {
         var min, max;
         var select = function(d) {
             var t = Number(d[stat]);
@@ -694,6 +699,7 @@ function create_vis(obj, player_csv, election_csv)
 
     t.append("div")
         .attr("class", "title")
+        .style("color", function(d, i) { return player_type_color[player_types[i]]; })
         .html(function(d) { return hist_title[d._stat] || d._stat; });
 
     chart = d3.selectAll(".chart")
