@@ -180,13 +180,14 @@ function create_scatterplot(player_csv)
     document.getElementById("scatterplot-y-axis").selectedIndex = stats.indexOf("BB");
 
     return {
+        player_dots: player_dots,
         x_stat: function(stat) {
             x_scale.domain([d3.min(player_csv, function(d) { return Number(d[stat]); }),
                             d3.max(player_csv, function(d) { return Number(d[stat]); })]);
             player_dots
                 .attr("display", function(d) {
                     return isNaN(d[x_stat])?"none":null;
-                }).transition()
+                })
                 .attr("cx", function(d) {
                     if (isNaN(d[stat]))
                         return -100;
@@ -206,7 +207,7 @@ function create_scatterplot(player_csv)
             player_dots
                 .attr("display", function(d) {
                     return isNaN(d[y_stat])?"none":null;
-                }).transition()
+                })
                 .attr("cy", function(d) {
                     if (isNaN(d[stat]))
                         return -100;
@@ -348,7 +349,9 @@ function renderAll() {
         shown[selection[i].Name] = 1;
     }
     var count = 0;
-    _.each([player_dots.selectAll("rect"), player_paths.selectAll("path")], function(obj) {
+    _.each([player_dots.selectAll("rect"), 
+            player_paths.selectAll("path"), 
+            scatterplot.player_dots], function(obj) {
         obj.style("display", function(d) {
             var v = shown[d.Name] || (d === clicked_player);
             count += ~~v;
@@ -979,7 +982,7 @@ function barChart() {
                     .style("display", "none")
                     .append("a")
                     .attr("href", "javascript:show(" + id + ")")
-                    .html(stats_name(query_key));
+                    .html(hist_title[query_key] || query_key);
                 show_span.append("span").text(" ");
 
                 g = div.append("svg")
