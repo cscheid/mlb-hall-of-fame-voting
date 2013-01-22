@@ -3,7 +3,7 @@
 <html>
 <head>
   <link rel="stylesheet" href="style.css"/>
-  <title>MLB Hall of Fame voting</title>
+  <title>MLB Hall of Fame voting trajectories</title>
 </head>
 <body>
   <script src="lib/d3.v3.min.js"></script>
@@ -14,7 +14,13 @@
 
   <script src="player.js"></script>
   <script src="index.js"></script>
-  <div style="float: right;margin-right:50px;margin-top:0.5em"><a href="#about">About</a> | <a href="#instructions">Instructions</a></div><h2>MLB Hall of Fame voting</h2>
+  <div style="float: right;margin-right:50px;margin-top:0.5em">
+    <a href="#introduction">Introduction</a> | 
+    <a href="#instructions">Instructions</a> | 
+    <a href="#about">About</a> | 
+    <a href="#footnotes">Footnotes and Examples</a> 
+  </div>
+  <h2>MLB Hall of Fame voting trajectories</h2>
   <div style="clear:both;"></div><hr>
   <div>
     <div style="float: left; margin-left: 50px">
@@ -23,7 +29,9 @@
     <div style="float: right; margin-right: 50px">
       <table id="player-stats">
 	<tr>
-	  <th>Name</th><th>Pos</th><th>Yrs</th><th>G</th><th>WAR</th><th>Batting:</th><th>AB</th><th>R</th><th align="right">H</th><th>HR</th><th>RBI</th><th>SB</th><th>BB</th><th align="right">BA</th><th>OBP</th><th>SLG</th><th>OPS</th>
+	  <th>Name</th><th>Pos</th><th>Yrs</th><th>G</th><th>WAR</th><th>Batting:</th><th>AB</th>
+      <th>R</th><th align="right">H</th><th>HR</th><th>RBI</th><th>SB</th><th>BB</th>
+      <th>BA</th><th>OBP</th><th>SLG</th><th>OPS</th>
 	</tr>
 	<tr>
 	  <td id="player-Name" class="tablename">-</td>
@@ -45,7 +53,8 @@
 	  <td id="player-OPS" class="player-stats" align="right">-</td>
 	</tr>
 	<tr>
-	  <th></th><th></th><th></th><th></th><th></th><th>Pitching:</th><th>W</th><th>L</th><th>ERA</th><th>WHIP</th><th>GS</th><th>SV</th><th>IP</th><th>H</th><th>HR</th><th>BB</th><th>SO</th>
+	  <th></th><th></th><th></th><th></th><th></th><th>Pitching:</th><th>W</th><th>L</th><th>ERA</th>
+      <th>WHIP</th><th>GS</th><th>SV</th><th>IP</th><th>H</th><th>HR</th><th>BB</th><th>SO</th>
 	</tr>
 	<tr align="right">
 	  <td></td>
@@ -93,16 +102,53 @@
     </div>
   </div>
   <div style="clear: both"></div>
-  <hr>
-  <p>This is a test of some text. Let's select all <a href="#state=state%5Bshown_histograms%5D%5B%5D=-1&state%5Bshown_histograms%5D%5B%5D=2&state%5Bshown_histograms%5D%5B%5D=3&state%5Bshown_histograms%5D%5B%5D=5&state%5Bshown_histograms%5D%5B%5D=6&state%5Bshown_histograms%5D%5B%5D=7&state%5Bshown_histograms%5D%5B%5D=9&state%5Bshown_histograms%5D%5B%5D=10&state%5Bshown_histograms%5D%5B%5D=11&state%5Bshown_histograms%5D%5B%5D=13&state%5Bshown_histograms%5D%5B%5D=14&state%5Bshown_histograms%5D%5B%5D=15&state%5Bshown_histograms%5D%5B%5D=16&state%5Bshown_histograms%5D%5B%5D=17&state%5Bshown_histograms%5D%5B%5D=19&state%5Bshown_histograms%5D%5B%5D=20&state%5Binduction_method%5D=2">real inductees</a> Now the <a href="#state=state%5Bshown_histograms%5D%5B%5D=-1&state%5Bshown_histograms%5D%5B%5D=2&state%5Bshown_histograms%5D%5B%5D=3&state%5Bshown_histograms%5D%5B%5D=5&state%5Bshown_histograms%5D%5B%5D=6&state%5Bshown_histograms%5D%5B%5D=7&state%5Bshown_histograms%5D%5B%5D=9&state%5Bshown_histograms%5D%5B%5D=10&state%5Bshown_histograms%5D%5B%5D=11&state%5Bshown_histograms%5D%5B%5D=13&state%5Bshown_histograms%5D%5B%5D=14&state%5Bshown_histograms%5D%5B%5D=15&state%5Bshown_histograms%5D%5B%5D=16&state%5Bshown_histograms%5D%5B%5D=17&state%5Bshown_histograms%5D%5B%5D=19&state%5Bshown_histograms%5D%5B%5D=20&state%5Binduction_method%5D=96">suits</a>!
     <hr>
-    <h2 id="instructions">How to use this</h2>
-      <p>As a general principle, clicking and dragging regions of the elements of this visualization will naturally create queries which restrict the data in the <b>other</b> elements to lie within the correct region. For example, if you drag a region in the WAR histogram between values 50 and 100, the other graphics will be updated to reflect only the players with WAR statistics between 50 and 100. When combined, these region form logical intersections: we only show players which satisfy <b>all</b> criteria. The legends are clickable (to toggle visibility of different positions and induction methods), and the main trajectory plot is also draggable. Clicking on any of the circles shows career stats for that specific player.</p>
-      <p>The state of the visualization is encoded in the address bar. This means you can click back and forward like you would when navigating different webpages; if you like a particular state, you can copy the URL and share it over email, Facebook, Twitter, etc.</p>
+    <h2 id="introduction">Introduction</h2>
+        <p>Baseball Hall of Fame voting can drive the average fan crazy. Year after year, great players fail to be voted in unanimously, mediocre players receive votes, and long-retired players experience wild swings in the percentage of voters who name them on their ballot, despite not having played an inning, thrown a pitch, or swung a bat during the previous five to twenty years. How can we explain this nonsense?</p>
+        <p>The answer is, for the most part, we can't. All a fan can do is accept that Baseball Hall of Fame voting, conducted by the Baseball Writers Association of America (BBWAA), is a phenomenon unto itself. If we can't understand baseball Hall of Fame voting, though, maybe the next best thing is <b>visualizing the data behind it</b>. The set of interactive plots on this webpage is our attempt to do that. We were especially interested in two things: (1) viewing the trajectories of BBWAA vote percentage by year for different players throughout history, and (2) simultaneously viewing the career statistics of these players, to help find patterns and explain their trajectories (or to reassure ourselves that the writers really <i>are</i> crazy).</p>
+        <p>The main figure above is a plot of BBWAA Hall of Fame voting by year for all 1,070 players who have appeared on the ballot since Hall of Fame voting began in 1936. The circular points represent each player's vote percentage in his <i>final</i> year on the BBWAA ballot, and the lines represent his vote percentage in prior years if he appeared on the ballot multiple times. A number of additional interactive tools help you select subsets of players to view in the main plot, including (1) the "Player Name" search box, (2) the two legends to the right of the main plot that encode each player's method of induction and primary position, and (3) the histograms below the plot, which allow subsets of players to be selected by their career statistics. We hope the interactive tools are intuitive; full <a href="#instructions">instructions</a> for interacting with the plots are available below, including instructions for how to share the URL of a version of the visualization that you created. We also describe the <a href="#about">raw data and software used for the plots</a>, and a few interesting <a href="#footnotes">footnotes and examples</a>.</p>
+    <hr>
+    <h2 id="instructions">Instructions</h2>
+        <p>To browse the player voting trajectories, use the following tools:</p>
+        <p> - Mouse-over any line or point in the main plot to highlight the player's trajectory and show his name</p>
+        <p> - Click a line or point to display that player's career statistics in the bar above the main plot</p>
+        <p> - Brush a region of the main plot to select only the trajectories whose <i>endpoints</i> are in the brushed-over rectangle</p>
+        <p> - View a subset of player trajectories by clicking the "Position" or "Inducted by" categories on the right side of the plot</p>
+        <p> - View a subset of trajectories defined by player statistics by brushing one or more histograms below the main plot</p>
+        <p>As a general principle, clicking and brushing regions of the elements of this visualization will create queries which restrict the data in <b>all</b> elements of the visualization to lie within the selected region. For example, if you brush a region in the WAR histogram between values 50 and 100, and you select "SS" from the position legend, the other histograms and the main plot will be updated to reflect only the shortstops with career WAR between 50 and 100. When combined, these regions form logical intersections: we only show trajectories and histogram counts for players that satisfy <b>all</b> selection criteria.</p>
+      <p>Last but not least, the state of the visualization is encoded in the address bar. This means you can click back and forward like you would when navigating different webpages; if you like a particular state, you can copy the URL and share it over email, Facebook, Twitter, etc.</p>
+    <hr>
     <h2 id="about">About this visualization</h2>
-    <p>This visualization was created by <a href="http://cscheid.net">Carlos Scheidegger</a> and <a href="http://www2.research.att.com/~kshirley/">Kenny Shirley</a>. It uses <a href="http://d3js.org">d3</a>, <a href="http://square.github.com/crossfilter/">Crossfilter</a> (specifically, <a href="http://www.jasondavies.com/">Jason Davies's</a> custom-filter branch in his <a href="https://github.com/jasondavies/crossfilter">fork</a>, which supports arbitrary filters), and CSV files created in <a href="http://www.r-project.org">R</a>, using raw data from <a href="http://www.baseball-reference.com/">baseball-reference.com</a>.</p>
+    <p>This visualization was created by <a href="http://cscheid.net">Carlos Scheidegger</a> and <a href="http://www2.research.att.com/~kshirley/">Kenny Shirley</a>. It uses <a href="http://d3js.org">d3</a>, <a href="http://square.github.com/crossfilter/">Crossfilter</a> (specifically, <a href="http://www.jasondavies.com/">Jason Davies's</a> custom-filter branch in his <a href="https://github.com/jasondavies/crossfilter">fork</a>, which supports arbitrary filters), and CSV files created in <a href="http://www.r-project.org">R</a>.</p>
 <p>The histogram rendering is a trivial change of the demonstration code in Crossfilter; the selectable legend was written from scratch (it is also trivial). The history management code was written on top of <a href="http://jquery.com">jQuery</a>'s <tt>param</tt> and <a href="http://benalman.com/projects/jquery-bbq-plugin/">jquery-bbq's</a> <tt>deparam</tt>, although the code has more than a few hacks in it. Bizarrely, these two functions do not form a bijection: <tt>$.param</tt> is not an injection from JSON objects to strings. <a href="https://www.destroyallsoftware.com/talks/wat">WAT</a></p>
+  <p>The BBWAA ballot data and player career statistics were downloaded from <a href="http://www.baseball-reference.com/">baseball-reference.com</a>. We gathered additional data regarding Veterans Committee elections, Negro Leagues elections, and some player position data from <a href="http://www.baseball-almanac.com/">baseball-almanac.com</a> and <a href="http://www.baseballhall.org/">baseballhall.org</a>.</p>
   <p></p>
+    <hr>
+    <h2 id="footnotes">Footnotes and Examples</h2>
+    <p>First, here are a few obvious selections, just for practice:</p>
+    <p> - The <a href="">First-Ballot Hall of Famers</a></p>
+    <p> - The <a href="">400-HR Club</a></p>
+    <p> - The <a href="">300-Win Club</a></p>
+    <p> - The <a href="">3000-Hit Club</a></p>
+    <p>Here are a few more obscure sets of players:</p>
+    <p> - The <a href="">Mitchell Report Club</a>: All players who were mentioned in the Mitchell Report (Geroge Mitchell's 2007 report on performance-enhancing drugs in baseball), according to Wikipedia (accessed __/__/__).</p>
+    <p> - The <a href="">15-Year Club</a>: All players who appeared on the ballot 15 or more times</p>
+    <p> - <a href="">Players</a> who received more than 40% of the vote on their first ballot</p>
+    <p> - <a href="">Rollercoaster Rides</a>: Players whose minimum vote percentage was less than 20% and whose maximum was above 70%.</p>
+    <hr>
+    <p>Last, here are a few footnotes and other random, sometimes-hilarious things we noticed while playing with and visualizing this data:</p> 
+    <p>1. Lou Gehrig and Roberto Clemente were elected via special elections in 1939 and 1973, respectively. The exact vote percentage for Gehrig is unknown; we chose to plot his 1939 data point at 100%, as if his election was unanimous.</p>
 
+    <p>2. Three players (Charlie Gehringer, Luke Appling, and Red Ruffing) were elected via runoff elections in 1949, 1964, and 1967, respectively. These players didn't receive 75% of the vote on the main ballot that year, but were inducted because they were the highest vote getters in a subsequent runoff election (held the same year).</p>
+
+    <p>3. Lefty Grove received 6 votes in 1960, despite the fact that he had already been inducted into the Hall of Fame 13 years earlier, appearing on 76.4% of the ballots that year! We removed his 1960 votes from the plot (and we suspect they were probably meant for Orval Grove, who received 7 votes that year, his last on the ballot).</p>
+
+    <p>4. Joe McCarthy is the only person who has received BBWAA votes despite the fact that, according to his Hall of Fame plaque, he never appeared in a single MLB game as a player.</p>
+
+    <p>5. Before 1960, active players sometimes received votes. Filter these out by selecting "omit active player votes". (For predictive modeling of trajectories, it's probably smart to omit the data that causes great players to have their trajectories start at very low values, like 1%).</p>
+
+    <p>6. Modern BBWAA voting rules weren't in place until 1967. Before that time, players sometimes received less than 5% of the vote and still appeared on future ballots, for instance. Also, players occasionally appeared on the ballot more than the current maximum of 15 times. (Edd Roush holds the record with 19 appearances).</p>
+    <p>7. 10 players in baseball history have had a career WAR below zero and received at least one Hall of Fame vote. Two of the most interesting players in this subset are Tommy Thevenow (SS, WAR = -6.7), who holds the record for most consecutive at-bats without a HR (3,347), and Eddie Miksis (2B, WAR = -5.0), whose "main claim to fame as a Cub" according to Wikipedia was "lending his glove to Ernie Banks in Banks' first-ever major league game." We point out that he certainly has another claim to <i>fame</i> -- his appearance on one BBWAA member's 1964 Hall of Fame ballot.</p>
+    <p></p>
 </body>
 </html>
