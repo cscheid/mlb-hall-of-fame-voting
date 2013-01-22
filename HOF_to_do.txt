@@ -45,6 +45,54 @@ Update: 1/19 11am:
   - Set up stats like ERA and BA to always have the right number of significant digits. Kenny will write this down somewhere.
 
 
+________________________________________________________________________________________________________________________
+
+Update: 1/22 2:45pm:
+
+
+To Do:
+- Insert above text (3 sections - probable with links to lower portions of the page)
+- Right-justify stat category names except Name, Pos, and the words "Batting:" and "Pitching:"
+- Right-justify actual statistics except for Name and Pos
+- Omit ".1" from category names "H.1", "HR.1", and "BB.1", both in the stat-line and the histograms
+- Statistic formatting:
+  WAR (1 decimal place)
+  BA, OBP, and SLG (3 decimals, and no leading "0")
+  OPS (3 decimals, and 1 digit before the decimal)
+  ERA, WHIP (2 decimal places)
+  IP (1 decimal place)
+
+- The text "x of 1,070 players selected". Make sure it displays properly. Change "Clear Query" to "Clear Selection"
+ -- on my laptop, the whole box jumps when I toggle between no selection (by position or method) vs. one selection. Depends on the number of players, "x", selected. Solve by reserving the right amount of space.
+
+- Maybe "Player Search by Name" instead of "Player Name" for search box
+- Line up the plot, method legend, and position legend (consider making the position legend multi-column ?)
+- Bigger tick mark labels?
+- Rotate histograms so increasing values of numbers go either left-to-right (normal layout), or bottom-to-top
+- Add in AB and R (delete other categories as necessary)
+- Add # of years on ballot as a histogram selection
+- Default histograms to show upon clicking the link: WAR, HR, H, W, SO, BA
+
+
+- One potential bug: If I click a player, and then make a selection that doesn't include that player, and then un-click the player, his trajectory still remains in the display with the other trajectories selected, even though he's not a member of that selection. Can the act of un-clicking him also hide his trajectory, if he is not a member of the current selection?
+
+
+- One new feature: can we visualize the years in which a player appeared on the ballot? (maybe as colored tick marks along the x-axis?) This would help viewers interpret straight line segments in the trajectories (i.e. they could tell the difference between someone who received a linear percentage of votes in many consecutive years vs. a person who had a long span of years between receiving any votes).
+
+
+
+STORIES: (selections to save and link to -- Kenny to explore these and will choose 3-5 of them, probably)
+
+1. First-ballot Hall of Famers
+2. On the ballot for 15 years (or more) (or maybe just > 10 years?)
+3. 400-HR club
+4. 300-W club
+5. 3000-H club
+6. Shortstops?
+7. Maybe pick out the trajectories with the greatest range? (i.e. those who have "travelled the farthest")
+8. First year above 40%, say. Or some number like that (to inform projections for current guys)
+
+
 
 
 
