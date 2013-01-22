@@ -74,9 +74,10 @@
     <table><tr><td valign="top">Inducted by:</td></tr><tr><td><span id="induction_legend"></span></td></tr><tr><td>Position:</td></tr><tr><td><span id="position_legend"></span></td></tr></table>
     </td></tr></table>
   </div>
-  <div id="charts" style="margin-left: 50px; margin-right:50px">
-  </div>
-  <div style="margin-left: 50px; margin-right:50px">Show stat (<span style="color: #00000">common stats</span>, <span style="color:#008080">pitcher stats</span>, <span style="color:#0080ff">batter stats</span>):
+  <div id="charts" style="float: left; width: 75%; margin-left: 50px;"></div>
+  <div style="float: right; width: 15%; margin-right: 50px;"><div id="scatterplot"></div></div>
+  <div style="clear: both"></div>
+  <div style="margin-left: 50px; margin-right:50px">Show histograms (<span style="color: #00000; cursor: pointer" onclick="show_common_stats()">common stats</span>, <span style="color:#008080; cursor: pointer" onclick="show_pitcher_stats()">pitcher stats</span>, <span style="color:#0080ff; cursor: pointer" onclick="show_batter_stats()">batter stats</span>):
     <div id="show" style="overflow: auto">
     </div>
   </div>

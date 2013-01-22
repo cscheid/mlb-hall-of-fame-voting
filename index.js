@@ -44,6 +44,70 @@ function fresh_vis_state()
 var vis_state = fresh_vis_state();
 
 //////////////////////////////////////////////////////////////////////////////
+// scatterplot
+
+function create_scatterplot()
+{
+    var w = 180, h = 180, margin = 20;
+
+    var svg = d3.select("#scatterplot")
+        .append("svg")
+        .attr("id", "scatterplot-svg")
+        .attr("width", "100%");
+    w = document.getElementById("scatterplot-svg").clientWidth - 2 * margin;
+    h = w;
+
+    svg = svg.attr("height", margin * 2 + h)
+        .append("g")
+        .attr("transform", "translate(" + margin + "," + margin + ")");
+    svg
+        .append("rect")
+        .attr("width", w)
+        .attr("height", h)
+        .attr("fill", "black")
+        .attr("fill-opacity", 0.1);
+
+    var x_scale = d3.scale.linear()
+        .domain([0, 1])
+        .range([0, w]);
+
+    var y_scale = d3.scale.linear()
+        .domain([0, 1])
+        .range([h, 0]);
+
+    var xAxis = d3.svg.axis();
+    var yAxis = d3.svg.axis();
+    xAxis.ticks(3);
+    yAxis.ticks(3);
+
+    xAxis.scale(x_scale).tickFormat(d3.format("d"));
+    yAxis.scale(y_scale).tickFormat(d3.format("d"));
+
+    xAxis.orient("bottom");
+    var xaxis_g = svg.append("g")
+        .attr("transform", "translate(0," + h + ")")
+        .attr("class", "axis");
+    xaxis_g.call(xAxis);
+
+    yAxis.orient("left");
+    var yaxis_g = svg.append("g")
+        .attr("transform", "translate(0,0)")
+        .attr("class", "axis");
+    yaxis_g.call(yAxis);
+
+    return {
+        x_domain: function(extent) {
+            x_scale.domain(extent);
+            xaxis_g.call(xAxis);
+        },
+        y_domain: function(extent) {
+            y_scale.domain(extent);
+            yaxis_g.call(yAxis);
+        }
+    };
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 function state_url()
 {
@@ -108,6 +172,18 @@ function update_brushes()
     // induction method brushes
     redraw_induction_legend_query();
     redraw_position_legend_query();
+}
+
+function sync_to_vis_state() {
+    replace_queries();
+    update_brushes();
+    for (var i=0; i<27; ++i) {
+        window.hide(i, true);
+    }
+    for (var k in vis_state.shown_histograms) {
+        window.show(vis_state.shown_histograms[k], true);
+    }
+    renderAll();
 }
 
 function highlight_on(player)
@@ -572,6 +648,29 @@ function create_vis(obj, player_csv, election_csv)
         renderAll();
     });
 
+    window.show_common_stats = function() {
+        save_vis_state();
+        vis_state.shown_histograms = [-1, 0, 1, 2, 22, 23, 24, 26, 28];        sync_to_vis_state();
+    };
+
+    window.show_common_stats = function() {
+        save_vis_state();
+        vis_state.shown_histograms = [-1, 0, 1, 2, 22, 23, 24, 26, 28];
+        sync_to_vis_state();
+    };
+
+    window.show_pitcher_stats = function() {
+        save_vis_state();
+        vis_state.shown_histograms = [-1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        sync_to_vis_state();
+    };
+
+    window.show_batter_stats = function() {
+        save_vis_state();
+        vis_state.shown_histograms = [-1, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+        sync_to_vis_state();
+    };
+
     window.filter = function(filters) {
         filters.forEach(function(d, i) { charts[i].filter(d); });
         renderAll();
@@ -705,6 +804,8 @@ function create_vis(obj, player_csv, election_csv)
     chart = d3.selectAll(".chart")
         .data(charts)
         .each(function(chart) { chart.on("brush", renderAll).on("brushend", renderAll); });
+
+    create_scatterplot();
     renderAll();
 }
 
@@ -971,18 +1072,6 @@ $(function() {
             var obj = create_players(player_csv, election_csv);
 
             create_vis(obj, player_csv, election_csv);
-
-            function sync_to_vis_state() {
-                replace_queries();
-                update_brushes();
-                for (var i=0; i<27; ++i) {
-                    window.hide(i, true);
-                }
-                for (var k in vis_state.shown_histograms) {
-                    window.show(vis_state.shown_histograms[k], true);
-                }
-                renderAll();
-            }
 
             window.addEventListener("popstate", function(e) {
                 vis_state = e.state || $.deparam(location.hash.substr(7), true).state || 
