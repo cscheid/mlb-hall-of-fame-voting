@@ -74,8 +74,19 @@
     <table><tr><td valign="top">Inducted by:</td></tr><tr><td><span id="induction_legend"></span></td></tr><tr><td>Position:</td></tr><tr><td><span id="position_legend"></span></td></tr></table>
     </td></tr></table>
   </div>
-  <div id="charts" style="float: left; width: 75%; margin-left: 50px;"></div>
-  <div style="float: right; width: 15%; margin-right: 50px;"><div id="scatterplot"></div></div>
+  <div id="charts" style="float: left; width: 72%; margin-left: 50px;"></div>
+  <div style="float: right; width: 18%; margin-right: 50px;"><div id="scatterplot"></div>
+    <div style="float: left; margin-right: 0.3em">x:</div>
+    <div style="float: left; width: 40%">
+      <select id="scatterplot-x-axis" onchange="change_scatterplot_x_axis()" style="width:90%">
+      </select>
+    </div>
+    <div style="float: right; width: 40%">
+      <select id="scatterplot-y-axis" onchange="change_scatterplot_y_axis()" style="width:90%">
+      </select>
+    </div>
+    <div style="float: right; margin-right: 0.3em">y:</div>
+  </div>
   <div style="clear: both"></div>
   <div style="margin-left: 50px; margin-right:50px">Show histograms (<span style="color: #00000; cursor: pointer" onclick="show_common_stats()">common stats</span>, <span style="color:#008080; cursor: pointer" onclick="show_pitcher_stats()">pitcher stats</span>, <span style="color:#0080ff; cursor: pointer" onclick="show_batter_stats()">batter stats</span>):
     <div id="show" style="overflow: auto">

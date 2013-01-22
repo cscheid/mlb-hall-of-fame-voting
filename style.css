@@ -88,6 +88,11 @@ h2 {
   font: 10px sans-serif;
 }
 
+.smalllabel {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12px;
+}
+
 .brush rect.extent {
   fill: steelblue;
   fill-opacity: .125;

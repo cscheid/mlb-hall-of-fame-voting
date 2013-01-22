@@ -19,6 +19,13 @@ var refresh_trajectory_brush;
 var redraw_induction_legend_query;
 var redraw_position_legend_query;
 var _debugging = false;
+var scatterplot;
+
+var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", 
+             // "AB", "R", 
+             "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS",
+             "min_vote", "max_vote", "first_vote", "last_vote", "first_appearance", "last_appearance", "Num.Years.On.Ballot"
+            ];
 
 var hist_title = {
     "Yrs": "Years",
@@ -34,6 +41,11 @@ var hist_title = {
     "Num.Years.On.Ballot": "Yrs.&nbsp;on&nbsp;ballot"
 };
 
+function stats_name(d)
+{
+    return hist_title[d._stat] || d._stat;
+}
+
 function fresh_vis_state()
 {
     return { 
@@ -46,20 +58,30 @@ var vis_state = fresh_vis_state();
 //////////////////////////////////////////////////////////////////////////////
 // scatterplot
 
-function create_scatterplot()
+function change_scatterplot_x_axis()
 {
-    var w = 180, h = 180, margin = 20;
+    scatterplot.x_stat(stats[document.getElementById("scatterplot-x-axis").selectedIndex]);
+}
+
+function change_scatterplot_y_axis()
+{
+    scatterplot.y_stat(stats[document.getElementById("scatterplot-y-axis").selectedIndex]);
+}
+
+function create_scatterplot(player_csv)
+{
+    var w, h, margin_bottom = 40, margin_left = 40, margin_top = 5, margin_right = 5;
 
     var svg = d3.select("#scatterplot")
         .append("svg")
         .attr("id", "scatterplot-svg")
         .attr("width", "100%");
-    w = document.getElementById("scatterplot-svg").clientWidth - 2 * margin;
+    w = document.getElementById("scatterplot-svg").clientWidth - margin_left - margin_right;
     h = w;
 
-    svg = svg.attr("height", margin * 2 + h)
+    svg = svg.attr("height", margin_bottom + h + margin_top)
         .append("g")
-        .attr("transform", "translate(" + margin + "," + margin + ")");
+        .attr("transform", "translate(" + margin_left + "," + margin_top + ")");
     svg
         .append("rect")
         .attr("width", w)
@@ -87,22 +109,116 @@ function create_scatterplot()
     var xaxis_g = svg.append("g")
         .attr("transform", "translate(0," + h + ")")
         .attr("class", "axis");
-    xaxis_g.call(xAxis);
 
     yAxis.orient("left");
     var yaxis_g = svg.append("g")
         .attr("transform", "translate(0,0)")
         .attr("class", "axis");
+
+    var x_text = svg.append("text")
+	.attr("class", "x smalllabel")
+	.attr("text-anchor", "middle")
+	.attr("x", w/2)
+	.attr("y", h+30);
+    x_text.text("H");
+
+    var y_text = svg.append("text")
+	.attr("class", "y smalllabel")
+	.attr("text-anchor", "middle")
+        .attr("transform", "rotate(-90, 0, " + h + ")")
+	.attr("x", w/2)
+	.attr("y", h-20);
+    y_text.text("BB");
+
+    var player_dots = svg.selectAll("circle")
+        .data(player_csv);
+
+    var x_stat = "H", y_stat = "BB";
+    // debugger;
+
+    x_scale.domain([d3.min(player_csv, function(d) { return d[x_stat]; }),
+                    d3.max(player_csv, function(d) { return d[x_stat]; })]);
+    y_scale.domain([d3.min(player_csv, function(d) { return d[y_stat]; }),
+                    d3.max(player_csv, function(d) { return d[y_stat]; })]);
+
+    player_dots.enter()
+        .append("circle")
+        .attr("r", 2)
+        .attr("cx", function(d) { 
+            if (isNaN(d[x_stat]))
+                return -100;
+            return x_scale(d[x_stat]);
+        })
+        .attr("cy", function(d) { 
+            if (isNaN(d[y_stat]))
+                return -100;
+            return y_scale(d[y_stat]); 
+        })
+	.append("svg:title")
+        .text(function(player) {
+            return player.Name;
+        })
+    ;
+    xaxis_g.call(xAxis);
     yaxis_g.call(yAxis);
 
+    var x_dropdown = d3.select("#scatterplot-x-axis")
+        .selectAll("option")
+        .data(stats);
+    x_dropdown.enter()
+        .append("option")
+        .text(function(d) { return d; });
+
+    var y_dropdown = d3.select("#scatterplot-y-axis")
+        .selectAll("option")
+        .data(stats);
+    y_dropdown.enter()
+        .append("option")
+        .text(function(d) { return d; });
+
+    document.getElementById("scatterplot-x-axis").selectedIndex = stats.indexOf("H");
+    document.getElementById("scatterplot-y-axis").selectedIndex = stats.indexOf("BB");
+
     return {
-        x_domain: function(extent) {
-            x_scale.domain(extent);
+        x_stat: function(stat) {
+            x_scale.domain([d3.min(player_csv, function(d) { return Number(d[stat]); }),
+                            d3.max(player_csv, function(d) { return Number(d[stat]); })]);
+            player_dots
+                .attr("display", function(d) {
+                    return isNaN(d[x_stat])?"none":null;
+                }).transition()
+                .attr("cx", function(d) {
+                    if (isNaN(d[stat]))
+                        return -100;
+                    return x_scale(d[stat]); 
+                });
+            x_stat = stat;
+            player_dots
+                .attr("display", function(d) {
+                    return isNaN(d[x_stat])?"none":null;
+                });
             xaxis_g.call(xAxis);
+            x_text.text(stat);
         },
-        y_domain: function(extent) {
-            y_scale.domain(extent);
+        y_stat: function(stat) {
+            y_scale.domain([d3.min(player_csv, function(d) { return Number(d[stat]); }),
+                            d3.max(player_csv, function(d) { return Number(d[stat]); })]);
+            player_dots
+                .attr("display", function(d) {
+                    return isNaN(d[y_stat])?"none":null;
+                }).transition()
+                .attr("cy", function(d) {
+                    if (isNaN(d[stat]))
+                        return -100;
+                    return y_scale(d[stat]); 
+                });
+            y_stat = stat;
+            player_dots
+                .attr("display", function(d) {
+                    return isNaN(d[y_stat])?"none":null;
+                });
             yaxis_g.call(yAxis);
+            y_text.text(stat);
         }
     };
 }
@@ -710,12 +826,6 @@ function create_vis(obj, player_csv, election_csv)
         d3.select(document.getElementById(stat + "-show")).style("display", "none");
     };
 
-    var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", 
-                 // "AB", "R", 
-                 "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS",
-                 "min_vote", "max_vote", "first_vote", "last_vote", "first_appearance", "last_appearance", "Num.Years.On.Ballot"
-                 ];
-
     var player_type_color = ["#000000",
                              "#008080",
                              "#0080FF"];
@@ -799,13 +909,13 @@ function create_vis(obj, player_csv, election_csv)
     t.append("div")
         .attr("class", "title")
         .style("color", function(d, i) { return player_type_color[player_types[i]]; })
-        .html(function(d) { return hist_title[d._stat] || d._stat; });
+        .html(stats_name);
 
     chart = d3.selectAll(".chart")
         .data(charts)
         .each(function(chart) { chart.on("brush", renderAll).on("brushend", renderAll); });
 
-    create_scatterplot();
+    scatterplot = create_scatterplot(player_csv);
     renderAll();
 }
 
@@ -869,7 +979,7 @@ function barChart() {
                     .style("display", "none")
                     .append("a")
                     .attr("href", "javascript:show(" + id + ")")
-                    .html(hist_title[query_key] || query_key);
+                    .html(stats_name(query_key));
                 show_span.append("span").text(" ");
 
                 g = div.append("svg")

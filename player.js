@@ -1,5 +1,10 @@
 function create_player(entry)
 {
+    for (var k in entry) {
+        var t = Number(entry[k]);
+        if (!isNaN(t))
+            entry[k] = t;
+    }
     return {
         Name: entry.Name,
         Pos: entry.position,
