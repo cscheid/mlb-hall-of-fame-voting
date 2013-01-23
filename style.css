@@ -93,6 +93,11 @@ h2 {
     font-size: 12px;
 }
 
+.player-name-background {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12px;
+}
+
 .brush rect.extent {
   fill: steelblue;
   fill-opacity: .125;

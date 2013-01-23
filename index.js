@@ -31,6 +31,7 @@ var dimensions = [];
 var groups = [];
 var lines = {};
 var dots = {};
+var player_names = {};
 var dimension_filter_map = {};
 var trajectory_brush;
 var refresh_trajectory_brush;
@@ -391,6 +392,7 @@ function sync_to_vis_state() {
 function highlight_on(player)
 {
     dots[player.Name].attr("stroke", "black").attr("stroke-width", 2).moveToFront();
+    player_names[player.Name].attr("display", null).moveToFront();
     lines[player.Name].attr("stroke-opacity", 1).attr("stroke-width", 3).moveToFront();
     scatterplot.player_dots_by_name[player.Name].attr("stroke", "black").attr("stroke-width", 2).attr("r", 5).moveToFront();
 }
@@ -398,6 +400,7 @@ function highlight_on(player)
 function highlight_off(player)
 {
     dots[player.Name].attr("stroke", "none").attr("stroke-width", 0);
+    player_names[player.Name].attr("display", "none");
     lines[player.Name].attr("stroke-opacity", 0.15).attr("stroke-width", 2);
     scatterplot.player_dots_by_name[player.Name].attr("stroke", "none").attr("stroke-width", 0).attr("r", 2);
 }
@@ -548,9 +551,10 @@ function create_vis(obj, player_csv, election_csv)
     player_dots = box2;
     player_paths = box1;
 
-    box2.selectAll("rect")
+    var q = box2.selectAll("rect")
         .data(players)
-        .enter()
+        .enter();
+    q
         .append("rect")
         .style("cursor", "pointer")
         .attr("fill-opacity", 1)
@@ -575,11 +579,43 @@ function create_vis(obj, player_csv, election_csv)
         .on("mouseout", function(player) { 
             if (clicked_player !== player)
                 highlight_off(player);
-        })
-	.append("svg:title")
-        .text(function(player) {
-            return player.Name;
         });
+
+    var player_name = q
+        .append("g")
+        .attr("display", "none")
+        .each(function(player) {
+            player_names[player.Name] = d3.select(this);
+        });
+
+    player_name
+        .append("text")
+        .attr("x", function(player) { return x(player.last_appearance)-5; })
+        .attr("y", function(player) { return y(player.last_vote)-5; })
+        .attr("class", "player-name-background")
+        .attr("text-anchor", function(player) {
+            if (player.last_appearance > 1975)
+                return "end";
+            else
+                return "start";
+        })
+        .text(function(player) { return player.Name; })
+        .attr("stroke", "white")
+        .attr("stroke-width", "4px");
+
+    player_name
+        .append("text")
+        .attr("x", function(player) { return x(player.last_appearance)-5; })
+        .attr("y", function(player) { return y(player.last_vote)-5; })
+        .attr("class", "smalllabel")
+        .attr("text-anchor", function(player) {
+            if (player.last_appearance > 1975)
+                return "end";
+            else
+                return "start";
+        })
+        .text(function(player) { return player.Name; })    
+;
 
     var line = d3.svg.line()
         .x(function(a) { return x(Number(a.Year)); })
@@ -939,7 +975,7 @@ function create_vis(obj, player_csv, election_csv)
     var stat_type_color = ["#000000",
                            "#008080",
                            "#0080FF"];
-    var stat_types = [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0];
+    var stat_types = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0];
 
     var bounds = {
         "ERA": { min: 1.5, max: 5 },
