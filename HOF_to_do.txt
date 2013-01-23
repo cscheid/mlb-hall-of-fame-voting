@@ -1,25 +1,8 @@
 Priority fixes:
 
+- add references
+
 - add a mention to truncation of histograms in the text
-
-- Statistics formatting (for the stat line at top of plot, and also for histogram axis labels)
-  - Right-justify stats that display above the plot.
-  - Set up stats like ERA and BA to always have the right number of significant digits. Kenny will write this down somewhere.
-- Right-justify stat category names except Name, Pos, and the words "Batting:" and "Pitching:"
-- Right-justify actual statistics except for Name and Pos
-
-- Statistic formatting:
-  WAR (1 decimal place)
-  BA, OBP, and SLG (3 decimals, and no leading "0")
-  OPS (3 decimals, and 1 digit before the decimal)
-  ERA, WHIP (2 decimal places)
-  IP (1 decimal place)
-
-- Maybe "Player Search by Name" instead of "Player Name" for search box
-
-- Default histograms to show upon clicking the link: WAR, HR, H, W, SO, BA
-
-- One potential bug: If I click a player, and then make a selection that doesn't include that player, and then un-click the player, his trajectory still remains in the display with the other trajectories selected, even though he's not a member of that selection. Can the act of un-clicking him also hide his trajectory, if he is not a member of the current selection?
 
 - Add a multiple-selection example query
 

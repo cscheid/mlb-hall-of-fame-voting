@@ -73,8 +73,12 @@ function format_stat(key, v)
 
 function fresh_vis_state()
 {
+    var lst = _.map(["WAR", "HR", "H", "W", "SO", "BA"],
+          function(i) { return stats.indexOf(i); });
+    lst.unshift(-1); // this jquery serialization sucks. If list is empty, we get no entry under the given key.
+
     return { 
-        shown_histograms: [-1,2,3,5,6,7,9,10,11,13,14,15,16,17,19,20] // this jquery serialization sucks. If list is empty, we get no entry under the given key.
+        shown_histograms: lst
     };
 }
 
@@ -860,11 +864,10 @@ function create_vis(obj, player_csv, election_csv)
         d3.select(document.getElementById(stat + "-show")).style("display", "none");
     };
 
-    var player_type_color = ["#000000",
-                             "#008080",
-                             "#0080FF"];
-
-    var player_types = [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0];
+    var stat_type_color = ["#000000",
+                           "#008080",
+                           "#0080FF"];
+    var stat_types = [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0];
 
     var bounds = {
         "ERA": { min: 1.5, max: 5 },
@@ -942,7 +945,7 @@ function create_vis(obj, player_csv, election_csv)
 
     t.append("div")
         .attr("class", "title")
-        .style("color", function(d, i) { return player_type_color[player_types[i]]; })
+        .style("color", function(d, i) { return stat_type_color[stat_types[i]]; })
         .html(function(d) { return stats_name(d._stat); });
 
     chart = d3.selectAll(".chart")

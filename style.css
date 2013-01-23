@@ -120,6 +120,23 @@ p {
     margin-right: 75px;
 }
 
+ul {
+    list-style: none;
+    margin-left: 75px;
+    margin-right: 75px;
+    padding-left: 20px;
+}
+
+ol {
+    margin-left: 75px;
+    margin-right: 75px;
+    padding-left: 20px;
+}
+
+ul li:before {
+    content: "- ";
+}
+
 .legend-text {
     font: 10pt Helvetica Neue, sans-serif;
 }
