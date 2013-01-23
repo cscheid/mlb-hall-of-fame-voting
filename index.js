@@ -1,4 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
+// Seriously, what are you doing in here? This was put together in less than a week!
+// Watch the horror at https://github.com/cscheid/mlb-hall-of-fame-voting/
+
+//////////////////////////////////////////////////////////////////////////////
 // google analytics
 
 var _gaq = _gaq || [];
@@ -58,8 +62,6 @@ d3.selection.prototype.moveToFront = function() {
         return this; // for chaining...
     };
 })(jQuery);
-
-//////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
 // which stats to search, their names, etc.
@@ -122,6 +124,32 @@ function fresh_vis_state()
 }
 
 var vis_state = fresh_vis_state();
+
+function state_url()
+{
+    return location.origin + location.pathname + 
+        "#state=" + $.param({ state: vis_state });
+}
+
+function save_vis_state(replace)
+{
+    if (replace)
+        history.replaceState(vis_state, "Query", state_url());
+    else
+        history.pushState(vis_state, "Query", state_url());
+}
+
+function vis_state_updater(brush, query_key_accessor, brush_state_accessor) {
+    return function() {
+        var query_key = query_key_accessor();
+        if (brush.empty()) {
+            delete vis_state[query_key];
+        } else {
+            vis_state[query_key] = brush_state_accessor();
+        }
+        history.replaceState(vis_state, "Query", state_url());
+    };
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // scatterplot
@@ -308,32 +336,6 @@ function create_scatterplot(player_list)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-
-function state_url()
-{
-    return location.origin + location.pathname + 
-        "#state=" + $.param({ state: vis_state });
-}
-
-function save_vis_state(replace)
-{
-    if (replace)
-        history.replaceState(vis_state, "Query", state_url());
-    else
-        history.pushState(vis_state, "Query", state_url());
-}
-
-function vis_state_updater(brush, query_key_accessor, brush_state_accessor) {
-    return function() {
-        var query_key = query_key_accessor();
-        if (brush.empty()) {
-            delete vis_state[query_key];
-        } else {
-            vis_state[query_key] = brush_state_accessor();
-        }
-        history.replaceState(vis_state, "Query", state_url());
-    };
-}
 
 function replace_queries()
 {

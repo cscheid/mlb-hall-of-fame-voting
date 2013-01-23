@@ -1,16 +1,10 @@
 Priority fixes:
 
-- add references
-
 - add a mention to truncation of histograms in the text
 
 - Add a multiple-selection example query
 
 - test layouts in different resolutions
-
---------------------------------------------------------------------------------
-
-- check whether active count sizing "jumps" on different resolutions and browsers
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 THINGS TO DO
