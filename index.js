@@ -590,8 +590,11 @@ function create_vis(obj, player_csv, election_csv)
 
     player_name
         .append("text")
-        .attr("x", function(player) { return x(player.last_appearance)-5; })
-        .attr("y", function(player) { return y(player.last_vote)-5; })
+        .attr("x", function(player) { 
+            var s = player.last_appearance > 1975 ? -1 : 1;
+            if (y(player.last_vote)-5 < 20) return x(player.last_appearance) + 15 * s; else return x(player.last_appearance)-5 * s; 
+        })
+        .attr("y", function(player) { return Math.max(y(player.last_vote)-5, 20); })
         .attr("class", "player-name-background")
         .attr("text-anchor", function(player) {
             if (player.last_appearance > 1975)
@@ -605,8 +608,11 @@ function create_vis(obj, player_csv, election_csv)
 
     player_name
         .append("text")
-        .attr("x", function(player) { return x(player.last_appearance)-5; })
-        .attr("y", function(player) { return y(player.last_vote)-5; })
+        .attr("x", function(player) { 
+            var s = player.last_appearance > 1975 ? -1 : 1
+            if (y(player.last_vote)-5 < 20) return x(player.last_appearance) + 15 * s; else return x(player.last_appearance)-5 * s; 
+        }) // return x(player.last_appearance)-5; })
+        .attr("y", function(player) { return Math.max(y(player.last_vote)-5, 20); })
         .attr("class", "smalllabel")
         .attr("text-anchor", function(player) {
             if (player.last_appearance > 1975)
@@ -1318,6 +1324,8 @@ function barChart() {
 $(function() {
     $("#show").css("width", window.innerWidth * 0.70);
 
+    // d3.csv("player_data.csv", function(error, player_csv) {
+    //     d3.csv("election_data.csv", function(error, election_csv) {
     d3.csv("http://s3.amazonaws.com/cscheid-mlb-hall-of-fame-voting/player_data.csv", function(error, player_csv) {
         d3.csv("http://s3.amazonaws.com/cscheid-mlb-hall-of-fame-voting/election_data.csv", function(error, election_csv) {
             var obj = create_players(player_csv, election_csv);
