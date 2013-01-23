@@ -64,7 +64,8 @@ var format_stat_map = {
 
 function format_stat(key, v)
 {
-    return (format_stat_map[key] || function(i) { return i; })(v);
+    if (key === "ERA") debugger;
+    return v === "-" ? "-" : ((format_stat_map[key] || function(i) { return i; })(v));
 }
 
 //////////////////////////////////////////////////////////////////////////////
