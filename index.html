@@ -154,5 +154,10 @@
 <p>The histogram rendering is a trivial change of the demonstration code in Crossfilter; the selectable legend was written from scratch (it is also trivial). The history management code was written on top of <a href="http://jquery.com">jQuery</a>'s <tt>param</tt> and <a href="http://benalman.com/projects/jquery-bbq-plugin/">jquery-bbq's</a> <tt>deparam</tt>, although the code has more than a few hacks in it. Bizarrely, these two functions do not form a bijection: <tt>$.param</tt> is not an injection from JSON objects to strings. <a href="https://www.destroyallsoftware.com/talks/wat">WAT</a></p>
   <p>The BBWAA ballot data and player career statistics were downloaded from <a href="http://www.baseball-reference.com/">baseball-reference.com</a>. We gathered additional data regarding Veterans Committee elections, Negro Leagues elections, and some player position data from <a href="http://www.baseball-almanac.com/">baseball-almanac.com</a> and <a href="http://www.baseballhall.org/">baseballhall.org</a>.</p>
   <p></p>
+    <hr>
+    <h2 id="about">Known Bugs</h2>
+    <ul>
+      <li>The state of the scatterplot is not tracked by back and forward buttons.</li>
+    </ul>
 </body>
 </html>
