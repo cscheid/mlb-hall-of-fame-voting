@@ -1318,8 +1318,8 @@ function barChart() {
 $(function() {
     $("#show").css("width", window.innerWidth * 0.70);
 
-    d3.csv("player_data.csv", function(error, player_csv) {
-        d3.csv("election_data.csv", function(error, election_csv) {
+    d3.csv("http://s3.amazonaws.com/cscheid-mlb-hall-of-fame-voting/player_data.csv", function(error, player_csv) {
+        d3.csv("http://s3.amazonaws.com/cscheid-mlb-hall-of-fame-voting/election_data.csv", function(error, election_csv) {
             var obj = create_players(player_csv, election_csv);
 
             create_vis(obj, player_csv, election_csv);

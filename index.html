@@ -6,7 +6,7 @@
   <title>MLB Hall of Fame Voting Trajectories</title>
 </head>
 <body>
-  <script src="everything.js"></script>
+  <script src="http://s3.amazonaws.com/cscheid-mlb-hall-of-fame-voting/everything.js"></script>
   <!-- <script src="lib/d3.v3.min.js"></script> -->
   <!-- <script src="lib/crossfilter.v1.min.js"></script> -->
   <!-- <script src="lib/jquery-1.6.2.min.js"></script> -->
@@ -153,7 +153,7 @@
     </ol>
     <hr>
     <h2 id="about">About this visualization</h2>
-    <p>This visualization was created by <a href="http://cscheid.net">Carlos Scheidegger</a> and <a href="http://www2.research.att.com/~kshirley/">Kenny Shirley</a>, who got lots of feedback and ideas from <a href="http://www2.research.att.com/~volinsky/">Chris Volinsky</a>. It uses <a href="http://d3js.org">d3</a>, <a href="http://square.github.com/crossfilter/">Crossfilter</a> (specifically, <a href="http://www.jasondavies.com/">Jason Davies's</a> custom-filter branch in his <a href="https://github.com/jasondavies/crossfilter">fork</a>, which supports arbitrary filters). The original exploratory visualizations were created in <a href="http://www.r-project.org">R</a>, as were the CSV files used here.
+    <p>This visualization was created by <a href="http://cscheid.net">Carlos Scheidegger</a> and <a href="http://www2.research.att.com/~kshirley/">Kenny Shirley</a>, who got lots of feedback and ideas from <a href="http://www2.research.att.com/~volinsky/">Chris Volinsky</a>. It uses <a href="http://d3js.org">d3</a>, <a href="http://square.github.com/crossfilter/">Crossfilter</a> (specifically, <a href="http://www.jasondavies.com/">Jason Davies's</a> custom-filter branch in his <a href="https://github.com/jasondavies/crossfilter">fork</a>, which supports arbitrary filters). The original exploratory visualizations were created in <a href="http://www.r-project.org">R</a>, as were the CSV files used here. The javascript source here is minified, but you can fork the <a href="https://github.com/cscheid/mlb-hall-of-fame-voting">GitHub repo</a> for all the gory details.</p>
     <p>The histogram rendering is a trivial change of the demonstration code in Crossfilter; the selectable legend was written from scratch (it is also trivial). The history management code was written on top of <a href="http://jquery.com">jQuery</a>'s <tt>param</tt> and <a href="http://benalman.com/projects/jquery-bbq-plugin/">jquery-bbq's</a> <tt>deparam</tt>, although the code has more than a few hacks in it. Bizarrely, these two functions do not form a bijection: <tt>$.param</tt> is not an injection from JSON objects to strings. <a href="https://www.destroyallsoftware.com/talks/wat">WAT</a>. We also use <a href="http://underscorejs.org">Underscore.js</a>.</p>
   <p>The BBWAA ballot data and player career statistics were downloaded from <a href="http://www.baseball-reference.com/">baseball-reference.com</a>. We gathered additional data regarding Veterans Committee elections, Negro Leagues elections, and some player position data from <a href="http://www.baseball-almanac.com/">baseball-almanac.com</a> and <a href="http://www.baseballhall.org/">baseballhall.org</a>.</p>
   <p></p>
