@@ -64,7 +64,6 @@ var format_stat_map = {
 
 function format_stat(key, v)
 {
-    if (key === "ERA") debugger;
     return v === "-" ? "-" : ((format_stat_map[key] || function(i) { return i; })(v));
 }
 
@@ -163,7 +162,6 @@ function create_scatterplot(player_csv)
         .data(player_csv);
 
     var x_stat = "H", y_stat = "BB";
-    // debugger;
 
     x_scale.domain([d3.min(player_csv, function(d) { return d[x_stat]; }),
                     d3.max(player_csv, function(d) { return d[x_stat]; })]);
@@ -1025,7 +1023,7 @@ function barChart() {
                     .style("display", "none")
                     .append("a")
                     .attr("href", "javascript:show(" + id + ")")
-                    .html(stats_name); // hist_title[query_key] || query_key);
+                    .html(stats_name(query_key)); // hist_title[query_key] || query_key);
                 show_span.append("span").text(" ");
 
                 g = div.append("svg")
