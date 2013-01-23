@@ -20,6 +20,8 @@ function create_players(csv, csv2) {
 
     for (i=0; i<csv.length; ++i) {
         var entry = csv[i];
+        // if (_.isUndefined(entry.Mitchell))
+        //     entry.Mitchell = Math.random();
         var player = players[entry.Name];
         if (player === undefined) {
             player = create_player(entry);

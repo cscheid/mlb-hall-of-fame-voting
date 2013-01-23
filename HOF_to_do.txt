@@ -1,12 +1,5 @@
 Priority fixes:
 
-- The text "x of 1,070 players selected". Make sure it displays properly. Change "Clear Query" to "Clear Selection"
- -- on my laptop, the whole box jumps when I toggle between no selection (by position or method) vs. one selection. Depends on the number of players, "x", selected. Solve by reserving the right amount of space.
-
-- rename badly named columns on scatterplots
-
-- Put back R, remove H.1, put in Mitchell, pending kenny's update; remove HR.1
-
 - add a mention to truncation of histograms in the text
 
 - Statistics formatting (for the stat line at top of plot, and also for histogram axis labels)
@@ -31,6 +24,10 @@ Priority fixes:
 - Add a multiple-selection example query
 
 - test layouts in different resolutions
+
+--------------------------------------------------------------------------------
+
+- check whether active count sizing "jumps" on different resolutions and browsers
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 THINGS TO DO

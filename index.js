@@ -21,10 +21,14 @@ var redraw_position_legend_query;
 var _debugging = false;
 var scatterplot;
 
-var stats = ["Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "SV", "IP", "H.1", "HR.1", "BB.1", "SO", 
+//////////////////////////////////////////////////////////////////////////////
+// which stats to search, their names, etc.
+
+var stats = ["Yrs", "G", "WAR", "mitchell.report",  // All
+             "W", "L", "ERA", "WHIP", "SV", "IP", "BB.1", "SO",  // Pitcher
              // "AB", "R", 
-             "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS",
-             "min_vote", "max_vote", "first_vote", "last_vote", "first_appearance", "last_appearance", "Num.Years.On.Ballot"
+             "H", "R", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", // Batter
+             "min_vote", "max_vote", "first_vote", "last_vote", "first_appearance", "last_appearance", "Num.Years.On.Ballot" // All
             ];
 
 var hist_title = {
@@ -38,13 +42,17 @@ var hist_title = {
     "last_vote": "last&nbsp;%",
     "first_appearance": "first&nbsp;yr.&nbsp;on&nbsp;ballot",
     "last_appearance": "last&nbsp;yr.&nbsp;on&nbsp;ballot",
-    "Num.Years.On.Ballot": "Yrs.&nbsp;on&nbsp;ballot"
+    "Num.Years.On.Ballot": "Yrs.&nbsp;on&nbsp;ballot",
+    "mitchell.report": "Mitchell"
 };
 
 function stats_name(d)
 {
-    return hist_title[d._stat] || d._stat;
+    return hist_title[d] || d;
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// state serialization
 
 function fresh_vis_state()
 {
@@ -167,14 +175,14 @@ function create_scatterplot(player_csv)
         .data(stats);
     x_dropdown.enter()
         .append("option")
-        .text(function(d) { return d; });
+        .text(function(d) { return stats_name(d).replace(/&nbsp;/g, " "); });
 
     var y_dropdown = d3.select("#scatterplot-y-axis")
         .selectAll("option")
         .data(stats);
     y_dropdown.enter()
         .append("option")
-        .text(function(d) { return d; });
+        .text(function(d) { return stats_name(d).replace(/&nbsp;/g, " "); });
 
     document.getElementById("scatterplot-x-axis").selectedIndex = stats.indexOf("H");
     document.getElementById("scatterplot-y-axis").selectedIndex = stats.indexOf("BB");
@@ -349,16 +357,19 @@ function renderAll() {
         shown[selection[i].Name] = 1;
     }
     var count = 0;
+    player_dots.selectAll("rect").each(function(d) {
+        count += ~~(shown[d.Name] || (d === clicked_player));
+    });
+
     _.each([player_dots.selectAll("rect"), 
             player_paths.selectAll("path"), 
             scatterplot.player_dots], function(obj) {
         obj.style("display", function(d) {
             var v = shown[d.Name] || (d === clicked_player);
-            count += ~~v;
             return v ? "inline" : "none";
         });
     });
-    d3.select("#active").text(formatNumber(count/2));
+    d3.select("#active").text(formatNumber(count));
 }
 
 function create_vis(obj, player_csv, election_csv)
@@ -777,19 +788,19 @@ function create_vis(obj, player_csv, election_csv)
 
     window.show_common_stats = function() {
         save_vis_state();
-        vis_state.shown_histograms = [-1, 0, 1, 2, 22, 23, 24, 26, 28];
+        vis_state.shown_histograms = [-1, 0, 1, 2, 3, 22, 23, 24, 26, 28];
         sync_to_vis_state();
     };
 
     window.show_pitcher_stats = function() {
         save_vis_state();
-        vis_state.shown_histograms = [-1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        vis_state.shown_histograms = [-1, 4, 5, 6, 7, 8, 9, 10, 11];
         sync_to_vis_state();
     };
 
     window.show_batter_stats = function() {
         save_vis_state();
-        vis_state.shown_histograms = [-1, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+        vis_state.shown_histograms = [-1, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
         sync_to_vis_state();
     };
 
@@ -898,8 +909,8 @@ function create_vis(obj, player_csv, election_csv)
         c._stat = stat;
         charts.push(c);
     });
-    last_vote_dimension = dimensions[25];
-    last_appearance_dimension = dimensions[27];
+    last_vote_dimension = dimensions[stats.indexOf("last_vote")];
+    last_appearance_dimension = dimensions[stats.indexOf("last_appearance")];
 
     var t = d3.select("#charts")
         .selectAll(".chart")
@@ -915,7 +926,7 @@ function create_vis(obj, player_csv, election_csv)
     t.append("div")
         .attr("class", "title")
         .style("color", function(d, i) { return player_type_color[player_types[i]]; })
-        .html(stats_name);
+        .html(function(d) { return stats_name(d._stat); });
 
     chart = d3.selectAll(".chart")
         .data(charts)
@@ -985,7 +996,7 @@ function barChart() {
                     .style("display", "none")
                     .append("a")
                     .attr("href", "javascript:show(" + id + ")")
-                    .html(hist_title[query_key] || query_key);
+                    .html(stats_name); // hist_title[query_key] || query_key);
                 show_span.append("span").text(" ");
 
                 g = div.append("svg")
