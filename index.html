@@ -3,7 +3,7 @@
 <html>
   <head>
   <link rel="stylesheet" href="style.css"/>
-  <title>MLB Hall of Fame voting trajectories</title>
+  <title>MLB Hall of Fame Voting Trajectories</title>
 </head>
 <body>
   <script src="lib/d3.v3.min.js"></script>
@@ -18,9 +18,10 @@
     <a href="#introduction">Introduction</a> | 
     <a href="#instructions">Instructions</a> | 
     <a href="#about">About</a> | 
-    <a href="#footnotes">Footnotes and Examples</a> 
+    <a href="#examples">Examples</a> | 
+    <a href="#footnotes">Footnotes</a> 
   </div>
-  <h2>MLB Hall of Fame voting trajectories</h2>
+  <h2>MLB Hall of Fame Voting Trajectories</h2>
   <div style="clear:both;"></div><hr>
   <div>
     <div style="float: left; margin-left: 50px">
@@ -122,31 +123,32 @@
         <p>As a general principle, clicking and brushing regions of the elements of this visualization will create queries which restrict the data in <b>all</b> elements of the visualization to lie within the selected region. For example, if you brush a region in the WAR histogram between values 50 and 100, and you select "SS" from the position legend, the other histograms and the main plot will be updated to reflect only the shortstops with career WAR between 50 and 100. When combined, these regions form logical intersections: we only show trajectories and histogram counts for players that satisfy <b>all</b> selection criteria.</p>
       <p>Last but not least, the state of the visualization is encoded in the address bar. This means you can click back and forward like you would when navigating different webpages; if you like a particular state, you can copy the URL and share it over email, Facebook, Twitter, etc.</p>
     <hr>
-    <h2 id="footnotes">Footnotes and Examples</h2>
+    <h2 id="examples">Examples</h2>
     <p>First, here are a few obvious selections, just for practice:</p>
     <ul>
-      <li>The <a href="">First-Ballot Hall of Famers</a></li>
-      <li>The <a href="">400-HR Club</a></li>
-      <li>The <a href="">300-Win Club</a></li>
-      <li>The <a href="">3000-Hit Club</a></li>
+      <li>The <a href="#state=state%5Bshown_histograms%5D%5B%5D=-1&state%5Bshown_histograms%5D%5B%5D=26&state%5Binduction_method%5D=14&state%5BNum.Years.On.Ballot%5D%5B%5D=0&state%5BNum.Years.On.Ballot%5D%5B%5D=1.7999999999999972">First-Ballot Hall of Famers</a>. We include Roberto Clemente (Special Election in 1973) and don't include Warren Spahn (b/c he received votes in 1958 while still active).</li>
+      <li>The <a href="#state=state%5Bshown_histograms%5D%5B%5D=-1&state%5Bshown_histograms%5D%5B%5D=12&state%5Bshown_histograms%5D%5B%5D=13&state%5Bshown_histograms%5D%5B%5D=14&state%5Bshown_histograms%5D%5B%5D=15&state%5Bshown_histograms%5D%5B%5D=16&state%5Bshown_histograms%5D%5B%5D=17&state%5Bshown_histograms%5D%5B%5D=18&state%5Bshown_histograms%5D%5B%5D=19&state%5Bshown_histograms%5D%5B%5D=20&state%5Bshown_histograms%5D%5B%5D=21&state%5BHR%5D%5B%5D=400&state%5BHR%5D%5B%5D=838.2">400-HR Club</a></li>
+      <li>The <a href="#state=state%5Bshown_histograms%5D%5B%5D=-1&state%5Bshown_histograms%5D%5B%5D=2&state%5Bshown_histograms%5D%5B%5D=14&state%5Bshown_histograms%5D%5B%5D=12&state%5Bshown_histograms%5D%5B%5D=4&state%5Bshown_histograms%5D%5B%5D=11&state%5Bshown_histograms%5D%5B%5D=18&state%5BW%5D%5B%5D=300&state%5BW%5D%5B%5D=440.00000000000006">300-Win Club</a></li>
+      <li>The <a href="#state=state%5Bshown_histograms%5D%5B%5D=-1&state%5Bshown_histograms%5D%5B%5D=2&state%5Bshown_histograms%5D%5B%5D=14&state%5Bshown_histograms%5D%5B%5D=12&state%5Bshown_histograms%5D%5B%5D=4&state%5Bshown_histograms%5D%5B%5D=11&state%5Bshown_histograms%5D%5B%5D=18&state%5BH%5D%5B%5D=2999.0000000000005&state%5BH%5D%5B%5D=4070.0000000000005">3000-Hit Club</a></li>
     </ul>
     <p>Here are a few more obscure sets of players:</p>
     <ul>
-      <li>The <a href="">Mitchell Report Club</a>: All players who were mentioned in the <a href="http://en.wikipedia.org/Mitchell_Report">Mitchell Report</a> (George Mitchell's 2007 report on performance-enhancing drugs in baseball), according to <a href="http://en.wikipedia.org/w/index.php?title=List_of_Major_League_Baseball_players_named_in_the_Mitchell_Report&oldid=531927845">Wikipedia</a>.</li>
-      <li>The <a href="">15-Year Club</a>: All players who appeared on the ballot 15 or more times</li>
+      <li>The <a href="#state=state%5Bshown_histograms%5D%5B%5D=-1&state%5Bshown_histograms%5D%5B%5D=2&state%5Bshown_histograms%5D%5B%5D=14&state%5Bshown_histograms%5D%5B%5D=12&state%5Bshown_histograms%5D%5B%5D=4&state%5Bshown_histograms%5D%5B%5D=11&state%5Bshown_histograms%5D%5B%5D=3&state%5Bmitchell.report%5D%5B%5D=0.5875&state%5Bmitchell.report%5D%5B%5D=1.1">Mitchell Report Club</a>: All players who were mentioned in the <a href="http://en.wikipedia.org/Mitchell_Report">Mitchell Report</a> (George Mitchell's 2007 report on performance-enhancing drugs in baseball), according to <a href="http://en.wikipedia.org/w/index.php?title=List_of_Major_League_Baseball_players_named_in_the_Mitchell_Report&oldid=531927845">Wikipedia</a>.</li>
+      <li>The <a href="#state=state%5Bshown_histograms%5D%5B%5D=-1&state%5Bshown_histograms%5D%5B%5D=2&state%5Bshown_histograms%5D%5B%5D=14&state%5Bshown_histograms%5D%5B%5D=12&state%5Bshown_histograms%5D%5B%5D=4&state%5Bshown_histograms%5D%5B%5D=11&state%5Bshown_histograms%5D%5B%5D=26&state%5BNum.Years.On.Ballot%5D%5B%5D=14.175&state%5BNum.Years.On.Ballot%5D%5B%5D=19.8">15-Year Club</a>: All players who appeared on the ballot 15 or more times</li>
       <li><a href="">Players</a> who received more than 40% of the vote on their first ballot</li>
       <li><a href="">Rollercoaster Rides</a>: Players whose minimum vote percentage was less than 20% and whose maximum was above 70%.</li>
     </ul>
     <hr>
-    <p>Last, here are a few footnotes and other random, sometimes-hilarious things we noticed while playing with and visualizing this data:</p> 
+    <h2 id="footnotes">Footnotes</h2>
+    <p>Last, here are a few footnotes about the data and other random things we noticed while playing with and visualizing this data:</p> 
     <ol>
       <li>Lou Gehrig and Roberto Clemente were elected via special elections in 1939 and 1973, respectively. The exact vote percentage for Gehrig is unknown; we chose to plot his 1939 data point at 100%, as if his election was unanimous.</li>
-      <li>Three players (Charlie Gehringer, Luke Appling, and Red Ruffing) were elected via runoff elections in 1949, 1964, and 1967, respectively. These players didn't receive 75% of the vote on the main ballot that year, but were inducted because they were the highest vote getters in a subsequent runoff election (held the same year).</li>
-      <li>Lefty Grove received 6 votes in 1960, despite the fact that he had already been inducted into the Hall of Fame 13 years earlier, appearing on 76.4% of the ballots that year! We removed his 1960 votes from the plot (and we suspect they were probably meant for Orval Grove, who received 7 votes that year, his last on the ballot).</li>
+      <li>Three players (<a href="#state=state%5Bshown_histograms%5D%5B%5D=-1&state%5Bshown_histograms%5D%5B%5D=2&state%5Bshown_histograms%5D%5B%5D=14&state%5Bshown_histograms%5D%5B%5D=12&state%5Bshown_histograms%5D%5B%5D=4&state%5Bshown_histograms%5D%5B%5D=11&state%5Bshown_histograms%5D%5B%5D=18&state%5Binduction_method%5D=8">Charlie Gehringer, Luke Appling, and Red Ruffing</a>) were elected via runoff elections in 1949, 1964, and 1967, respectively. These players didn't receive 75% of the vote on the main ballot that year, but were inducted because they were the highest vote getters in a subsequent runoff election (held the same year). This obviously doesn't happen anymore...</li>
+      <li>Lefty Grove received 6 votes in 1960, despite the fact that he had already been inducted into the Hall of Fame 13 years earlier, appearing on 76.4% of the ballots that year! We removed his 1960 votes from the plot (and we suspect they were probably meant for Orval Grove, who received 7 votes that year, his last year on the ballot).</li>
       <li>Joe McCarthy is the only person who has received BBWAA votes despite the fact that, according to his Hall of Fame plaque, he never appeared in a single MLB game as a player.</li>
-      <li>Before 1960, active players sometimes received votes. Filter these out by selecting "omit active player votes". (For predictive modeling of trajectories, it's probably smart to omit the data that causes great players to have their trajectories start at very low values, like 1%).</li>
+      <li>Before 1960, active players sometimes received votes, (such as Warren Spahn in 1958), and in general, players who made late-career comebacks after being retired for multiple years often have strange-looking trajectories (Minnie Minoso, and recently, Jose Rijo). We keep these data points in the plot. For a thorough description of BBWAA voting rules (maybe treated more like "guidelines" sometimes?), check out this nice page at <a href="http://www.baseball-reference.com/about/hof_voting.shtml">baseball-reference.com</a>.</li>
       <li>Modern BBWAA voting rules weren't in place until 1967. Before that time, players sometimes received less than 5% of the vote and still appeared on future ballots, for instance. Also, players occasionally appeared on the ballot more than the current maximum of 15 times. (Edd Roush holds the record with 19 appearances).</li>
-      <li>10 players in baseball history have had a career WAR below zero and received at least one Hall of Fame vote. Two of the most interesting players in this subset are Tommy Thevenow (SS, WAR = -6.7), who holds the record for most consecutive at-bats without a HR (3,347), and Eddie Miksis (2B, WAR = -5.0), whose "main claim to fame as a Cub" according to Wikipedia was "lending his glove to Ernie Banks in Banks' first-ever major league game." We point out that he certainly has another claim to <i>fame</i> -- his appearance on one BBWAA member's 1964 Hall of Fame ballot.</li>
+      <li>10 players in baseball history have had a career WAR below zero and received at least one Hall of Fame vote. Two of the most interesting players in this subset are Tommy Thevenow (SS, WAR = -6.7), who holds the record for most consecutive at-bats without a HR (3,347), and Eddie Miksis (2B, WAR = -5.0), whose "main claim to fame as a Cub" according to Wikipedia was "lending his glove to Ernie Banks in Banks' first-ever major league game." He certainly has at least <i>one</i> other claim to fame -- his appearance on one BBWAA member's 1964 Hall of Fame ballot.</li>
     </ol>
     <hr>
     <h2 id="about">About this visualization</h2>
