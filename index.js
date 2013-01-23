@@ -25,13 +25,25 @@ var induction_method_colormap = d3.scale.category10();
 induction_method_colormap.domain([0,4,1,3,5,2,6,7]);
 
 //////////////////////////////////////////////////////////////////////////////
-https://groups.google.com/forum/?fromgroups=#!searchin/d3-js/scope/d3-js/eUEJWSSWDRY/XWKLd3QuaAoJ
+// https://groups.google.com/forum/?fromgroups=#!searchin/d3-js/scope/d3-js/eUEJWSSWDRY/XWKLd3QuaAoJ
 
 d3.selection.prototype.moveToFront = function() {
     return this.each(function() {
         this.parentNode.appendChild(this);
     });
 };
+
+//////////////////////////////////////////////////////////////////////////////
+// http://stackoverflow.com/questions/4801655/how-to-go-to-a-specific-element-on-page
+
+(function($) {
+    $.fn.goTo = function() {
+        $('html, body').animate({
+            scrollTop: $(this).offset().top + 'px'
+        }, 'fast');
+        return this; // for chaining...
+    };
+})(jQuery);
 
 //////////////////////////////////////////////////////////////////////////////
 // which stats to search, their names, etc.
@@ -174,7 +186,6 @@ function create_scatterplot(player_list)
         .data(player_list);
 
     var x_stat = "H", y_stat = "BB";
-    debugger;
 
     x_scale.domain([d3.min(player_list, function(d) { return d.Stats[x_stat]; }),
                     d3.max(player_list, function(d) { return d.Stats[x_stat]; })]);
@@ -834,6 +845,7 @@ function create_vis(obj, player_csv, election_csv)
         vis_state = fresh_vis_state();
         vis_state.shown_histograms = old_histogram;
         sync_to_vis_state();
+        save_vis_state(true);
     };
 
     window.show_default_stats = function() {
@@ -843,24 +855,28 @@ function create_vis(obj, player_csv, election_csv)
         lst.unshift(-1);
         vis_state.shown_histograms = lst;
         sync_to_vis_state();
+        save_vis_state(true);
     };
 
     window.show_common_stats = function() {
         save_vis_state();
         vis_state.shown_histograms = [-1, 0, 1, 2, 3, 22, 23, 24, 26, 28];
         sync_to_vis_state();
+        save_vis_state(true);
     };
 
     window.show_pitcher_stats = function() {
         save_vis_state();
         vis_state.shown_histograms = [-1, 4, 5, 6, 7, 8, 9, 10, 11];
         sync_to_vis_state();
+        save_vis_state(true);
     };
 
     window.show_batter_stats = function() {
         save_vis_state();
         vis_state.shown_histograms = [-1, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
         sync_to_vis_state();
+        save_vis_state(true);
     };
 
     window.filter = function(filters) {
