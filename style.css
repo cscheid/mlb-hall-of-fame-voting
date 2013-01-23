@@ -104,6 +104,10 @@ h2 {
 }
 
 th {
+    text-align: right;
+}
+
+.th-nonstat {
     text-align: left;
 }
 

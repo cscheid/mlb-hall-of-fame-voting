@@ -51,6 +51,22 @@ function stats_name(d)
     return hist_title[d] || d;
 }
 
+var format_stat_map = {
+    "ERA": d3.format("0.2f"),
+    "WHIP": d3.format("0.2f"),
+    "BA": function(i) { return d3.format(".3f")(i).substring(1); },
+    "OBP": function(i) { return d3.format(".3f")(i).substring(1); },
+    "SLG": function(i) { return d3.format(".3f")(i).substring(1); },
+    "OPS": d3.format("0.3f"),
+    "IP": d3.format(".1f"),
+    "WAR": d3.format(".1f")
+};
+
+function format_stat(key, v)
+{
+    return (format_stat_map[key] || function(i) { return i; })(v);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // state serialization
 
@@ -326,7 +342,7 @@ function highlight_off(player)
 function toggle_player(player)
 {
     var lst = ["Name", "Pos", "Yrs", "G", "WAR", "W", "L", "ERA", "WHIP", "GS", "SV", "IP", "H.1", "HR.1", "BB.1", "SO",
-               "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", "OPS.Plus"];
+               "AB", "R", "H", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS"];
     if (clicked_player !== undefined)
         highlight_off(clicked_player);
     if (clicked_player === player) {
@@ -343,7 +359,7 @@ function toggle_player(player)
                 v = player[c];
             else if (v === "NA")
                 v = "-";
-            document.getElementById("player-"+c).innerHTML = v;
+            document.getElementById("player-"+c).innerHTML = format_stat(c, v);
         });
     }
     renderAll();
