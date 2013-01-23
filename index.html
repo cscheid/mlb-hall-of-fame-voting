@@ -29,7 +29,7 @@
     <div style="float: right; margin-right: 50px">
       <table id="player-stats">
 	<tr>
-	  <th class="th-nonstat">Name</th><th class="th-nonstat">Pos</th><th>Yrs</th><th>G</th><th>WAR</th><th class="th-nonstat" style="color:#0080ff">Batting:</th><th style="color:#0080ff">AB</th>
+	  <th class="th-nonstat">Name</th><th class="th-nonstat">Pos</th><th>Yrs</th><th>G</th><th>WAR</th><th style="padding-left:2em"></th></th><th style="color:#0080ff">Batting:</th><th style="color:#0080ff">AB</th>
       <th style="color:#0080ff">R</th><th style="color:#0080ff">H</th><th style="color:#0080ff">HR</th><th style="color:#0080ff">RBI</th><th style="color:#0080ff">SB</th><th style="color:#0080ff">BB</th>
       <th style="color:#0080ff">BA</th><th style="color:#0080ff">OBP</th><th style="color:#0080ff">SLG</th><th style="color:#0080ff">OPS</th>
 	</tr>
@@ -39,6 +39,7 @@
 	  <td id="player-Yrs" class="player-stats" align="right">-</td>
 	  <td id="player-G" class="player-stats" style="width:2.8em" align="right">-</td>
 	  <td id="player-WAR" class="player-stats" style="width:2.8em" align="right">-</td>
+	  <td></td>
 	  <td></td>
 	  <td id="player-AB" class="player-stats" style="width:3.2em" align="right">-</td>
 	  <td id="player-R" class="player-stats" style="width:2.8em" align="right">-</td>
@@ -53,10 +54,11 @@
 	  <td id="player-OPS" class="player-stats" align="right">-</td>
 	</tr>
 	<tr>
-	  <th></th><th></th><th></th><th></th><th></th><th class="th-nonstat" style="color:#008080">Pitching:</th><th style="color:#008080">W</th><th style="color:#008080">L</th><th style="color:#008080">ERA</th>
+	  <th></th><th></th><th></th><th></th><th></th><th></th><th style="color:#008080">Pitching:</th><th style="color:#008080">W</th><th style="color:#008080">L</th><th style="color:#008080">ERA</th>
       <th style="color:#008080">WHIP</th><th style="color:#008080">GS</th><th style="color:#008080">SV</th><th style="color:#008080">IP</th><th style="color:#008080">H</th><th style="color:#008080">HR</th><th style="color:#008080">BB</th><th style="color:#008080">SO</th>
 	</tr>
 	<tr align="right">
+	  <td></td>
 	  <td></td>
 	  <td></td>
 	  <td></td>
@@ -78,7 +80,7 @@
       </table>
     </div>
     <div style="clear: left"></div>
-    <div id="totals" style="margin-left: 50px; margin-right: 50px"><span id="active">-</span> of <span id="total">-</span> players selected.<br><a href="javascript:clear_query()">Clear query</a>.</div>
+    <div id="totals" style="margin-left: 50px; margin-right: 50px"><span id="active">-</span> of <span id="total">-</span> players selected.<br><a href="javascript:clear_query()">Clear query</a>, <a href="javascript:reset_everything()">Reset to starting point</a>.</div>
     <table><tr><td style="padding-left: 50px"><span id="main"></span></td><td>
     <table><tr><td valign="top">Inducted by:</td></tr><tr><td><span id="induction_legend"></span></td></tr><tr><td>Position:</td></tr><tr><td><span id="position_legend"></span></td></tr></table>
     </td></tr></table>
