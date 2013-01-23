@@ -1,0 +1,9 @@
+{
+  "name": "mlb-hall-of-fame-voting-vis",
+  "version": "0.0.1",
+  "description": "mlb-hall-of-fame-voting-vis",
+  "keywords": [ ],
+  "dependencies": {
+    "uglify-js": "2.2.1"
+  }
+}
