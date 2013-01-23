@@ -807,6 +807,15 @@ function create_vis(obj, player_csv, election_csv)
         sync_to_vis_state();
     };
 
+    window.show_default_stats = function() {
+        save_vis_state();
+        var lst = _.map(["WAR", "HR", "H", "W", "SO", "BA"],
+                        function(i) { return stats.indexOf(i); });
+        lst.unshift(-1);
+        vis_state.shown_histograms = lst;
+        sync_to_vis_state();
+    };
+
     window.show_common_stats = function() {
         save_vis_state();
         vis_state.shown_histograms = [-1, 0, 1, 2, 3, 22, 23, 24, 26, 28];
