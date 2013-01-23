@@ -644,10 +644,6 @@ function create_vis(obj, player_csv, election_csv)
         .on("mouseout", function(player) {
             if (clicked_player !== player)
                 highlight_off(player);
-        })
-        .append("svg:title")
-        .text(function(player) {
-            return player.Name;
         });
 
     //////////////////////////////////////////////////////////////////////////
