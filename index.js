@@ -18,7 +18,7 @@ _gaq.push(['_trackPageview']);
 
 var width = window.innerWidth * 0.70, height = window.innerHeight * 0.5;
 var margin = { top: 10, right: 20, bottom: 40, left: 50 };
-var first_year = 1936, last_year = 2014.1;
+var first_year = 1936, last_year = 2015.1;
 var cf, all, chart;
 var formatNumber = d3.format(",d");
 var player_dots;
@@ -1328,6 +1328,7 @@ $(function() {
          d3.csv("election_data.csv", function(error, election_csv) {
     //d3.csv("http://s3.amazonaws.com/cscheid-mlb-hall-of-fame-voting/player_data.csv", function(error, player_csv) {
         //d3.csv("http://s3.amazonaws.com/cscheid-mlb-hall-of-fame-voting/election_data.csv", function(error, election_csv) {
+//						 debugger;
             var obj = create_players(player_csv, election_csv);
 
             create_vis(obj, player_csv, election_csv);
