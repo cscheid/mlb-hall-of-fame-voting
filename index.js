@@ -18,7 +18,7 @@ _gaq.push(['_trackPageview']);
 
 var width = window.innerWidth * 0.70, height = window.innerHeight * 0.5;
 var margin = { top: 10, right: 20, bottom: 40, left: 50 };
-var first_year = 1936, last_year = 2015.1;
+var first_year = 1936, last_year = 2016.1;
 var cf, all, chart;
 var formatNumber = d3.format(",d");
 var player_dots;
@@ -69,7 +69,7 @@ d3.selection.prototype.moveToFront = function() {
 
 var stats = ["Yrs", "G", "WAR", "mitchell.report",  // All
              "W", "L", "ERA", "WHIP", "SV", "IP", "BB.1", "SO",  // Pitcher
-             // "AB", "R", 
+             // "AB", "R",
              "H", "R", "HR", "RBI", "SB", "BB", "BA", "OBP", "SLG", "OPS", // Batter
              "min_vote", "max_vote", "first_vote", "last_vote", "first_appearance", "last_appearance", "Num.Years.On.Ballot" // All
             ];
@@ -119,7 +119,7 @@ function fresh_vis_state()
           function(i) { return stats.indexOf(i); });
     lst.unshift(-1); // this jquery serialization sucks. If list is empty, we get no entry under the given key.
 
-    return { 
+    return {
         shown_histograms: lst
     };
 }
@@ -128,7 +128,7 @@ var vis_state = fresh_vis_state();
 
 function state_url()
 {
-    return location.origin + location.pathname + 
+    return location.origin + location.pathname +
         "#state=" + $.param({ state: vis_state });
 }
 
@@ -251,19 +251,19 @@ function create_scatterplot(player_list)
         .style("cursor", "pointer")
         .on("click", toggle_player)
         .on("mouseover", highlight_on)
-        .on("mouseout", function(player) { 
+        .on("mouseout", function(player) {
             if (clicked_player !== player)
                 highlight_off(player);
         })
-        .attr("cx", function(d) { 
+        .attr("cx", function(d) {
             if (isNaN(d.Stats[x_stat]))
                 return -100;
             return x_scale(d.Stats[x_stat]);
         })
-        .attr("cy", function(d) { 
+        .attr("cy", function(d) {
             if (isNaN(d.Stats[y_stat]))
                 return -100;
-            return y_scale(d.Stats[y_stat]); 
+            return y_scale(d.Stats[y_stat]);
         })
 	.append("svg:title")
         .text(function(player) {
@@ -303,7 +303,7 @@ function create_scatterplot(player_list)
                 .attr("cx", function(d) {
                     if (isNaN(d.Stats[stat]))
                         return -100;
-                    return x_scale(d.Stats[stat]); 
+                    return x_scale(d.Stats[stat]);
                 });
             x_stat = stat;
             player_dots
@@ -323,7 +323,7 @@ function create_scatterplot(player_list)
                 .attr("cy", function(d) {
                     if (isNaN(d.Stats[stat]))
                         return -100;
-                    return y_scale(d.Stats[stat]); 
+                    return y_scale(d.Stats[stat]);
                 });
             y_stat = stat;
             player_dots
@@ -443,8 +443,8 @@ function renderAll() {
         count += ~~(shown[d.Name] || (d === clicked_player));
     });
 
-    _.each([player_dots.selectAll("rect"), 
-            player_paths.selectAll("path"), 
+    _.each([player_dots.selectAll("rect"),
+            player_paths.selectAll("path"),
             scatterplot.player_dots], function(obj) {
         obj.style("display", function(d) {
             var v = shown[d.Name] || (d === clicked_player);
@@ -506,7 +506,7 @@ function create_vis(obj, player_csv, election_csv)
 
     var yAxis = d3.svg.axis();
     yAxis.scale(y).tickFormat(d3.format("d"));
-    
+
     yAxis.orient("left");
     svg.append("g")
 	.attr("transform", "translate(" + margin.left + ",0)")
@@ -525,7 +525,7 @@ function create_vis(obj, player_csv, election_csv)
         .attr("y1", y(75))
         .attr("y2", y(75))
         .attr("stroke", "green");
-    
+
     for (i=1; i<=9; ++i){
       svg.append("line")
         .attr("x1", x(first_year))
@@ -547,7 +547,7 @@ function create_vis(obj, player_csv, election_csv)
     var box0 = svg.append("g");
     var box1 = svg.append("g");
     var box2 = svg.append("g");
-    
+
     player_dots = box2;
     player_paths = box1;
 
@@ -571,12 +571,12 @@ function create_vis(obj, player_csv, election_csv)
 	})
         .attr("stroke", "none")
         .attr("x", function(player) { return x(player.last_appearance)-5; })
-        .attr("y", function(player) { 
-            return y(player.last_vote)-5; 
+        .attr("y", function(player) {
+            return y(player.last_vote)-5;
         })
         .on("click", toggle_player)
         .on("mouseover", highlight_on)
-        .on("mouseout", function(player) { 
+        .on("mouseout", function(player) {
             if (clicked_player !== player)
                 highlight_off(player);
         });
@@ -590,9 +590,9 @@ function create_vis(obj, player_csv, election_csv)
 
     player_name
         .append("text")
-        .attr("x", function(player) { 
+        .attr("x", function(player) {
             var s = player.last_appearance > 1975 ? -1 : 1;
-            if (y(player.last_vote)-5 < 20) return x(player.last_appearance) + 15 * s; else return x(player.last_appearance)-5 * s; 
+            if (y(player.last_vote)-5 < 20) return x(player.last_appearance) + 15 * s; else return x(player.last_appearance)-5 * s;
         })
         .attr("y", function(player) { return Math.max(y(player.last_vote)-5, 20); })
         .attr("class", "player-name-background")
@@ -608,9 +608,9 @@ function create_vis(obj, player_csv, election_csv)
 
     player_name
         .append("text")
-        .attr("x", function(player) { 
+        .attr("x", function(player) {
             var s = player.last_appearance > 1975 ? -1 : 1
-            if (y(player.last_vote)-5 < 20) return x(player.last_appearance) + 15 * s; else return x(player.last_appearance)-5 * s; 
+            if (y(player.last_vote)-5 < 20) return x(player.last_appearance) + 15 * s; else return x(player.last_appearance)-5 * s;
         }) // return x(player.last_appearance)-5; })
         .attr("y", function(player) { return Math.max(y(player.last_vote)-5, 20); })
         .attr("class", "smalllabel")
@@ -620,24 +620,24 @@ function create_vis(obj, player_csv, election_csv)
             else
                 return "start";
         })
-        .text(function(player) { return player.Name; })    
+        .text(function(player) { return player.Name; })
 ;
 
     var line = d3.svg.line()
         .x(function(a) { return x(Number(a.Year)); })
-        .y(function(a) { 
+        .y(function(a) {
             var t = Number(a["pct"]);
             if (isNaN(t)) t = 100; // only happens for Lou Gehrig;
-            return y(t); 
+            return y(t);
         });
-    
+
     box1.selectAll("path")
         .data(players)
         .enter()
         .append("svg:path")
-        .attr("d", function(player) { 
+        .attr("d", function(player) {
             lines[player.Name] = d3.select(this);
-            var x = line(player.Appearances); 
+            var x = line(player.Appearances);
             return x;
         })
         .attr("stroke", "black")
@@ -693,14 +693,14 @@ function create_vis(obj, player_csv, election_csv)
     });
 
     //////////////////////////////////////////////////////////////////////////
-    
+
     svg.append("text")
 	.attr("class", "x label")
 	.attr("text-anchor", "end")
 	.attr("x", margin.left + width/2 + 20)
 	.attr("y", height + margin.top + margin.bottom)
 	.text("Year of Vote");
-    
+
     // Add a y-axis label.
     svg.append("text")
 	.attr("class", "y label")
@@ -723,16 +723,16 @@ function create_vis(obj, player_csv, election_csv)
     for (i=0; i<positions.length-1; ++i)
         position_mask[positions[i]] = 1 << i;
 
-    position_mask["Batters"] = 
-        position_mask["C"] | 
-        position_mask["1B"] | 
-        position_mask["2B"] | 
-        position_mask["3B"] | 
-        position_mask["SS"] | 
-        position_mask["LF"] | 
-        position_mask["CF"] | 
-        position_mask["RF"] | 
-        position_mask["OF"] | 
+    position_mask["Batters"] =
+        position_mask["C"] |
+        position_mask["1B"] |
+        position_mask["2B"] |
+        position_mask["3B"] |
+        position_mask["SS"] |
+        position_mask["LF"] |
+        position_mask["CF"] |
+        position_mask["RF"] |
+        position_mask["OF"] |
         position_mask["DH"];
 
     var method_query_value = 0;
@@ -777,12 +777,12 @@ function create_vis(obj, player_csv, election_csv)
         });
         renderAll();
         induction_legend_rects.transition()
-            .attr("fill-opacity", function(d, i) { 
+            .attr("fill-opacity", function(d, i) {
                 return (method_query_value === 0 || ((1 << i) & method_query_value)) ?
                     1.0 : 0.2;
             });
         induction_legend_texts.transition()
-            .attr("fill-opacity", function(d, i) { 
+            .attr("fill-opacity", function(d, i) {
                 return (method_query_value === 0 || ((1 << i) & method_query_value)) ?
                     1.0 : 0.2;
             });
@@ -844,12 +844,12 @@ function create_vis(obj, player_csv, election_csv)
         });
         renderAll();
         position_legend_rects.transition()
-            .attr("fill-opacity", function(d, i) { 
+            .attr("fill-opacity", function(d, i) {
                 return (position_query_value === 0 || (position_mask[d] & position_query_value)) ?
                     1.0 : 0.2;
             });
         position_legend_texts.transition()
-            .attr("fill-opacity", function(d, i) { 
+            .attr("fill-opacity", function(d, i) {
                 return (position_query_value === 0 || (position_mask[d] & position_query_value)) ?
                     1.0 : 0.2;
             });
@@ -958,7 +958,7 @@ function create_vis(obj, player_csv, election_csv)
         }
         d3.select(document.getElementById(stat + "-chart")).style("display", "none");
         d3.select(document.getElementById(stat + "-show")).style("display", null);
-        
+
     };
 
     window.show = function(i, mask_vis_state) {
@@ -1014,7 +1014,7 @@ function create_vis(obj, player_csv, election_csv)
         } else {
             min = bounds[stat].min;
             max = bounds[stat].max;
-        } 
+        }
         var range = max - min;
         var dimension = cf.dimension(select);
         var group = dimension.group(function(d) {
@@ -1111,7 +1111,7 @@ function barChart() {
                     .attr("href", "javascript:hide(" + id + ")")
                     .attr("class", "hide")
                     .text("hide");
-                
+
                 div.select(".chart-opts").append("a")
                     .attr("href", "javascript:reset(" + id + ")")
                     .attr("class", "reset")
@@ -1334,7 +1334,7 @@ $(function() {
             create_vis(obj, player_csv, election_csv);
 
             window.addEventListener("popstate", function(e) {
-                vis_state = e.state || $.deparam(location.hash.substr(7), true).state || 
+                vis_state = e.state || $.deparam(location.hash.substr(7), true).state ||
                     fresh_vis_state();
                 sync_to_vis_state();
             });

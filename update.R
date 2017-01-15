@@ -1,29 +1,30 @@
 # R code to update the HOF voting viz after election results are released
-rm(list=ls())
+rm(list = ls())
 setwd("~/Stats/mlb-hall-of-fame-voting/")
 
 # First, update election_data.csv:
 
-# 1. Download vorting results from baseball-reference.com as .csv file
+# 1. Download voting results from baseball-reference.com as .csv file
 # 2. From excel, insert Year = [current year] as first column
 # 3. Replace "X-" with "" in the player name column
 # 4. Change YoB to be an integer (remove "th" and "st", etc.)
-# 5. Insert column for number of ballots that were returned this year
+# 5. Insert column (after Votes) for number of ballots that were returned this year
 # 6. Use an excel formula to set up percentage without the "%" signs
 # 7. Copy the first 7 columns into the election_data.csv file at the top
 
 # Next, update players_data.csv
 
-# 1. Download vorting results from baseball-reference.com as .csv file (same first step)
-# 2. Remove the first column and the first row
+# 1. Download voting results from baseball-reference.com as .csv file (same first step)
+# 2. Remove the first column
 # 3. Replace "X-" with "" in the name column
 # 4. Change the last column name, "Pos Summary" to "pos" (to avoid multibyte string problem)
+# 5. Remove the rows with voting info, so it looks like results2015.csv, for example
 
 # read the updated voting results into R:
-update <- read.csv("results2015.csv", as.is = TRUE)
+update <- read.csv("results2016.csv", as.is = TRUE)
 
 # read in players data:
-player <- read.csv("player_data.csv", as.is = TRUE)
+player <- read.csv("player_data_old.csv", as.is = TRUE)
 
 # Find the rows in player that we have an update for (2nd year or later on ballot):
 m <- match(update[, "Name"], player[, "Name"])
@@ -84,16 +85,7 @@ player[m[!is.na(m)], cols] <- update[!is.na(m), cols]
 # add in the first-ballot players:
 player <- rbind(update[is.na(m), ], player)
 
-#write.csv(player, file = "player_data_new.csv", row.names = FALSE)
-
-
-
-
-
-
-
-
-
+#write.csv(player, file = "player_data_new2.csv", row.names = FALSE)
 
 
 
